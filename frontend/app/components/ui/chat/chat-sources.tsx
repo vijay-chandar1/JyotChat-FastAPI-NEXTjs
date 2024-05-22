@@ -84,9 +84,17 @@ function NodeInfo({ node }: { node: SourceNode }) {
       }
     return (
       <div className="flex items-center px-2 py-1 justify-between my-2">
-        <span>{filePath} (Page: {pageLabel})</span>
+        <a
+    href={filePath.startsWith("http") ? `${filePath}#page=${pageLabel}` : `https://stljyot1.blob.core.windows.net/stl-jyot-ai-resources/pdfs/${filePath}.pdf#page=${pageLabel}`}
+    target="_blank"
+    style={{ color: 'black', cursor: 'pointer', textDecoration: 'none' }}
+    onMouseOver={(e) => (e.target as HTMLElement).style.color = 'grey'}
+    onMouseOut={(e) => (e.target as HTMLElement).style.color = 'black'}
+  >
+    {filePath} (Page: {pageLabel})
+  </a>
         <Button
-          onClick={() => copyToClipboard(filePath)}
+          onClick={() => copyToClipboard(filePath.startsWith("http") ? `${filePath}#page=${pageLabel}` : `https://stljyot1.blob.core.windows.net/stl-jyot-ai-resources/pdfs/${filePath}.pdf#page=${pageLabel}`)}
           size="icon"
           variant="ghost"
           className="h-12 w-12"
