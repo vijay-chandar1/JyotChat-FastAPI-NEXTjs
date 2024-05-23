@@ -14,6 +14,7 @@ RUN npm run build
 # ====================================
 FROM build as release
 
+EXPOSE 3000
 # Serve the static files
 CMD ["npm", "run", "start"]
 

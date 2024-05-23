@@ -94,14 +94,20 @@ def init_gemini():
     )
 
 
-def init_cohere():
+def init_cohere(temperature=os.getenv("LLM_TEMPERATURE", 0.4)):
     from llama_index.llms.litellm import LiteLLM
     from llama_index.embeddings.cohere import CohereEmbedding
 
     Settings.embed_model = CohereEmbedding( cohere_api_key=os.getenv("COHERE_API_KEY"),
                                             model_name=os.getenv("EMBEDDING_MODEL"),
                                             input_type="search_query",
-                                            )
+                                            )                                  
+    Settings.llm = LiteLLM(  api_key=os.getenv("COHERE_API_KEY"),
+                             model=os.getenv("MODEL"),
+                             temperature=temperature
+                            #  preamble=preamble,    
+                            )
+
 
     # preamble = """
     # ## Task & Context
@@ -110,10 +116,4 @@ def init_cohere():
     # ## Style Guide
     # Respond in the same language as the user's question. Use full sentences, proper grammar, and correct spelling. 
     # Give answer to {query_str} using the context if required.
-    # """                                     
-    Settings.llm = LiteLLM(  api_key=os.getenv("COHERE_API_KEY"),
-                             model=os.getenv("MODEL"),
-                             temperature=0.6,
-                            #  preamble=preamble,    
-                            )
-
+    # """   

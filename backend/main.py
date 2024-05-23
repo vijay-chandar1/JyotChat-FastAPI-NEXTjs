@@ -5,14 +5,15 @@ load_dotenv()
 import logging
 import os
 import uvicorn
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse
 from app.api.routers.chat import chat_router
 from app.settings import init_settings
 from app.observability import init_observability
-
-
+from app.settings import init_cohere 
+from pydantic import BaseModel
+from app.engine import update_top_k
 app = FastAPI()
 
 init_settings()
@@ -20,6 +21,20 @@ init_observability()
 
 environment = os.getenv("ENVIRONMENT", "dev")  # Default to 'development' if not set
 
+# Define a model for temperature update request
+class TemperatureUpdate(BaseModel):
+    temperature: float
+class TopKUpdate(BaseModel):
+    topK: int
+
+# Function to update temperature in settings
+def update_temperature(temperature: float):
+    init_cohere(temperature)  # Update temperature in settings
+
+# Function to update topK in settings
+def update_topK(topK: int):
+    # Update the top_k variable in the __init__.py module
+    update_top_k(topK)
 
 if environment == "dev":
     logger = logging.getLogger("uvicorn")
@@ -37,6 +52,15 @@ if environment == "dev":
     async def redirect_to_docs():
         return RedirectResponse(url="/docs")
 
+@app.post("/update_temperature")
+async def update_temperature_endpoint(update: TemperatureUpdate):
+    update_temperature(update.temperature)
+    return {"message": "Temperature updated successfully"}
+
+@app.post("/update_topk")
+async def update_topk_endpoint(update: TopKUpdate):
+    update_topK(update.topK)
+    return {"message": "topK updated successfully"}
 
 app.include_router(chat_router, prefix="/api/chat")
 
