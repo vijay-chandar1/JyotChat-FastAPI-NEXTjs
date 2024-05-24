@@ -42,24 +42,24 @@ export default function Home() {
   }, [temperatureValue, topKValue]);
 
   return (
-    <main className="flex min-h-screen flex-col items-center gap-10 p-24 background-gradient">
+    <main className="flex min-h-screen flex-col items-center gap-10 pt-5 p-24 background-gradient">
       <div className="mt-0"> {/* Add margin-top to move Header down */}
       <Header />
       </div>
       {/* <label htmlFor="custom-settings">Custom Settings</label> */}
-      <div className="slider-wrapper" style={{ width: '30%' }}>
+      <div className="slider-wrapper" style={{ width: '30%', cursor: 'pointer' }}>
         {/* TopK label with selected value */}
         <label htmlFor="topK">Top K: {topKValue}</label>
         {/* Slider for TopK */}
         <Slider
           defaultValue={[3]}
-          min={0}
+          min={1}
           max={5}
           step={1}
           onValueChange={(value) => setTopKValue(value[0])} // Update state when slider value changes
         />
       </div>
-      <div className="slider-wrapper" style={{ width: '30%' }}>
+      <div className="slider-wrapper" style={{ width: '30%', cursor: 'pointer' }}>
         {/* Temperature label with selected value */}
         <label htmlFor="temperature">Temperature: {temperatureValue}</label>
         {/* Slider for Temperature */}
