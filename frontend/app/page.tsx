@@ -8,7 +8,7 @@ import axios from "axios";
 export default function Home() {
   // State to hold the current value of each slider
   const [topKValue, setTopKValue] = useState(3);
-  const [temperatureValue, setTemperatureValue] = useState(0.4);
+  const [temperatureValue, setTemperatureValue] = useState(0);
 
   useEffect(() => {
     // Define a function to make the API call to update temperature
@@ -64,7 +64,7 @@ export default function Home() {
         <label htmlFor="temperature">Temperature: {temperatureValue}</label>
         {/* Slider for Temperature */}
         <Slider
-          defaultValue={[0.4]}
+          defaultValue={[0]}
           min={0}
           max={1}
           step={0.1}

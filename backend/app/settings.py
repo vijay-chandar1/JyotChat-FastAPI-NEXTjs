@@ -94,7 +94,7 @@ def init_gemini():
     )
 
 
-def init_cohere(temperature=os.getenv("LLM_TEMPERATURE", 0.4)):
+def init_cohere(temperature=os.getenv("LLM_TEMPERATURE", 0)):
     from llama_index.llms.litellm import LiteLLM
     from llama_index.embeddings.cohere import CohereEmbedding
 
