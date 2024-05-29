@@ -49,7 +49,7 @@ export default function Home() {
       {/* <label htmlFor="custom-settings">Custom Settings</label> */}
       <div className="slider-wrapper" style={{ width: '30%', cursor: 'pointer' }}>
         {/* TopK label with selected value */}
-        <label htmlFor="topK">Top K: {topKValue}</label>
+        <label htmlFor="topK" title="Top K refers to the number of most probable alternatives that the model will consider while making predictions. A higher value of K means the model considers more alternatives, which might make the model slower but potentially more accurate." style={{cursor: "pointer"}}>Top K: {topKValue}</label>
         {/* Slider for TopK */}
         <Slider
           defaultValue={[3]}
@@ -61,7 +61,7 @@ export default function Home() {
       </div>
       <div className="slider-wrapper" style={{ width: '30%', cursor: 'pointer' }}>
         {/* Temperature label with selected value */}
-        <label htmlFor="temperature">Temperature: {temperatureValue}</label>
+        <label htmlFor="temperature" title="Temperature is a parameter of the model that controls the randomness of the predictions. A higher temperature value results in more random predictions, while a lower value makes the predictions more deterministic." style={{cursor: "pointer"}}>Temperature: {temperatureValue}</label>
         {/* Slider for Temperature */}
         <Slider
           defaultValue={[0]}
