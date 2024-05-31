@@ -18,7 +18,7 @@ def init_settings():
     else:
         raise ValueError(f"Invalid model provider: {model_provider}")
     Settings.chunk_size = int(os.getenv("CHUNK_SIZE", "512"))
-    Settings.chunk_overlap = int(os.getenv("CHUNK_OVERLAP", "200"))
+    Settings.chunk_overlap = int(os.getenv("CHUNK_OVERLAP", "256")) #256
 
 
 def init_ollama():

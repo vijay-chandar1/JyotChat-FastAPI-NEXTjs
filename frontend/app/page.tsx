@@ -9,12 +9,12 @@ export default function Home() {
   // State to hold the current value of each slider
   const [topKValue, setTopKValue] = useState(3);
   const [temperatureValue, setTemperatureValue] = useState(0);
-
+  const BASE_URL = process.env.REACT_APP_BASE_URL || 'http://localhost:8000';
   useEffect(() => {
     // Define a function to make the API call to update temperature
     const updateTemperatureBackend = async () => {
       try {
-        await axios.post('http://localhost:8000/update_temperature', {
+        await axios.post(`${BASE_URL}/update_temperature`, {
           temperature: temperatureValue
         });
         console.log('Temperature updated in the backend successfully!');
@@ -26,7 +26,7 @@ export default function Home() {
     // Define a function to make the API call to update topK
     const updateTopKBackend = async () => {
       try {
-        await axios.post('http://localhost:8000/update_topk', {
+        await axios.post(`${BASE_URL}/update_topk`, {
           topK: topKValue
         });
         console.log('topK updated in the backend successfully!');
@@ -49,7 +49,15 @@ export default function Home() {
       {/* <label htmlFor="custom-settings">Custom Settings</label> */}
       <div className="slider-wrapper" style={{ width: '30%', cursor: 'pointer' }}>
         {/* TopK label with selected value */}
-        <label htmlFor="topK" title="Top K refers to the number of most probable alternatives that the model will consider while making predictions. A higher value of K means the model considers more alternatives, which might make the model slower but potentially more accurate." style={{cursor: "pointer"}}>Top K: {topKValue}</label>
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+        <label htmlFor="topK">
+          Top K: {topKValue}
+        </label>
+        <img 
+          src="/info.png" title="Top K refers to the number of most probable alternatives that the model will consider while making predictions. A higher value of K means the model considers more alternatives, which might make the model slower but potentially more accurate." 
+          style={{width: '12px', height: '12px', marginLeft: '8px'}}
+        />
+      </div>
         {/* Slider for TopK */}
         <Slider
           defaultValue={[3]}
@@ -61,7 +69,17 @@ export default function Home() {
       </div>
       <div className="slider-wrapper" style={{ width: '30%', cursor: 'pointer' }}>
         {/* Temperature label with selected value */}
-        <label htmlFor="temperature" title="Temperature is a parameter of the model that controls the randomness of the predictions. A higher temperature value results in more random predictions, while a lower value makes the predictions more deterministic." style={{cursor: "pointer"}}>Temperature: {temperatureValue}</label>
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+        <label htmlFor="temperature">
+          Temperature: {temperatureValue}
+        </label>
+        <img 
+          src="/info.png" 
+          title="Temperature is a parameter of the model that controls the randomness of the predictions. A higher temperature value results in more random predictions, while a lower value makes the predictions more deterministic." 
+          style={{width: '12px', height: '12px', marginLeft: '8px'}}
+        />
+      </div>
+
         {/* Slider for Temperature */}
         <Slider
           defaultValue={[0]}
