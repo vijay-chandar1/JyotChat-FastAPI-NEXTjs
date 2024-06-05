@@ -26,6 +26,8 @@ class TemperatureUpdate(BaseModel):
     temperature: float
 class TopKUpdate(BaseModel):
     topK: int
+class ModelSelection(BaseModel):
+    model: str
 
 # Function to update temperature in settings
 def update_temperature(temperature: float):
@@ -61,6 +63,12 @@ async def update_temperature_endpoint(update: TemperatureUpdate):
 async def update_topk_endpoint(update: TopKUpdate):
     update_topK(update.topK)
     return {"message": "topK updated successfully"}
+
+@app.post("/select_model")
+async def select_model_endpoint(selection: ModelSelection):
+    # Call the function to update the model in settings
+    init_cohere(selection.model)
+    return {"message": "Model updated successfully"}
 
 app.include_router(chat_router, prefix="/api/chat")
 

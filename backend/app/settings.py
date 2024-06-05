@@ -93,27 +93,59 @@ def init_gemini():
         model_name=embed_model_map[os.getenv("EMBEDDING_MODEL")]
     )
 
-
-def init_cohere(temperature=os.getenv("LLM_TEMPERATURE", 0)):
+def init_cohere(model_name="cohere", temperature=os.getenv("LLM_TEMPERATURE", 0)):
     from llama_index.llms.litellm import LiteLLM
     from llama_index.embeddings.cohere import CohereEmbedding
 
-    Settings.embed_model = CohereEmbedding( cohere_api_key=os.getenv("COHERE_API_KEY"),
-                                            model_name=os.getenv("EMBEDDING_MODEL"),
-                                            input_type="search_query",
-                                            )                                  
-    Settings.llm = LiteLLM(  api_key=os.getenv("COHERE_API_KEY"),
-                             model=os.getenv("MODEL"),
-                             temperature=temperature
-                            #  preamble=preamble,    
-                            )
+    if model_name == "cohere":
+        Settings.embed_model = CohereEmbedding( cohere_api_key=os.getenv("COHERE_API_KEY"),
+                                                model_name=os.getenv("EMBEDDING_MODEL"),
+                                                input_type="search_query",
+                                                embedding_type="float",
+                                                )  
+        Settings.llm = LiteLLM(  api_key=os.getenv("COHERE_API_KEY"),
+                                 model=os.getenv("MODEL"),
+                                 temperature=temperature,
+                                 )
+    elif model_name == "llama":
+        Settings.llm = LiteLLM(model="anyscale/meta-llama/Llama-2-70b-chat-hf",
+                               temperature=temperature,)
+    elif model_name == "openai":
+        Settings.llm = LiteLLM(model = "gpt-4o",
+                               temperature=temperature,)
+    else:
+        raise ValueError(f"Invalid model name: {model_name}")
 
 
-    # preamble = """
-    # ## Task & Context
-    # As an interactive assistant called JyotChat, your primary role is to answer a wide array of questions and requests related to the teachings of Jyot and its Guru, Acharya Yugbhushan Suriji.
-    # You will utilize a broad context given in Gujarati to research and provide the best possible answers focusing on serving the user's needs.
-    # ## Style Guide
-    # Respond in the same language as the user's question. Use full sentences, proper grammar, and correct spelling. 
-    # Give answer to {query_str} using the context if required.
-    # """   
+# def init_cohere(temperature=os.getenv("LLM_TEMPERATURE", 0)):
+#     from llama_index.llms.litellm import LiteLLM
+#     from llama_index.embeddings.cohere import CohereEmbedding
+
+#     Settings.embed_model = CohereEmbedding( cohere_api_key=os.getenv("COHERE_API_KEY"),
+#                                             model_name=os.getenv("EMBEDDING_MODEL"),
+#                                             input_type="search_query",
+#                                             embedding_type="float",
+#                                             )  
+#     # preamble = """
+#     # ## Task & Context
+
+#     # As an interactive assistant called JyotChat, your primary role is to answer a wide array of questions and 
+#     # requests related to the teachings of Jyot and its Guru, Acharya Yugbhushan Suriji.
+#     # You will utilize a broad context given in Gujarati to research and provide the best possible answers 
+#     # focusing on serving the user's needs.
+
+#     # ## Style Guide
+    
+#     # Respond in the same language as the user's question. Use full sentences, proper grammar, and correct spelling. 
+#     # Give answer to {query_str} using the context if required.
+#     # """
+
+#     Settings.llm = LiteLLM(  api_key=os.getenv("COHERE_API_KEY"),
+#                              model=os.getenv("MODEL"),
+#                              temperature=temperature,
+#                             #  input_type="search_query",
+#                             #  embedding_type='float',
+#                             #  preamble=preamble,    
+#                             )
+# # anyscale/meta-llama/Llama-2-70b-chat-hf
+ 

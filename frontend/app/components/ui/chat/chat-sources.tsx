@@ -78,10 +78,18 @@ function NodeInfo({ node }: { node: SourceNode }) {
       // remove the extension from the file name
       filePath = path.parse(filePath).name;
 
+      // let pageLabel = "";
+      // if (typeof node.metadata["page_label"] === "string") { 
+      //   pageLabel = node.metadata["page_label"];
+      // }
       let pageLabel = "";
       if (typeof node.metadata["page_label"] === "string") { 
-        pageLabel = node.metadata["page_label"];
-      }
+        let parts = node.metadata["page_label"].split("-");
+        if (parts.length > 1) {
+          pageLabel = parts[1]; // This will be '51' if page_label is 'B-51'
+        }
+}
+
     return (
       <div className="flex items-center px-2 py-1 justify-between my-2">
         <a

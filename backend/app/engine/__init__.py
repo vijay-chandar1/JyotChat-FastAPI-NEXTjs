@@ -23,6 +23,7 @@ def get_chat_engine():
         chat_mode="condense_plus_context",
     )
 
+#system_prompt=system_prompt
 def update_top_k(new_top_k: int):
     global top_k
     top_k = new_top_k

@@ -3,6 +3,7 @@ import Header from "@/app/components/header";
 import ChatSection from "./components/chat-section";
 import { useState, useEffect } from "react";
 import { Slider } from "./components/ui/slider";
+import { ComboboxDemo } from "./components/ui/combobox";
 import axios from "axios";
 
 export default function Home() {
@@ -46,8 +47,12 @@ export default function Home() {
       <div className="mt-0"> {/* Add margin-top to move Header down */}
       <Header />
       </div>
+
+
+
       {/* <label htmlFor="custom-settings">Custom Settings</label> */}
-      <div className="slider-wrapper" style={{ width: '30%', cursor: 'pointer' }}>
+
+      <div className="slider-wrapper" style={{ width: '20%', cursor: 'pointer' }}>
         {/* TopK label with selected value */}
         <div style={{ display: 'flex', alignItems: 'center' }}>
         <label htmlFor="topK">
@@ -67,7 +72,7 @@ export default function Home() {
           onValueChange={(value) => setTopKValue(value[0])} // Update state when slider value changes
         />
       </div>
-      <div className="slider-wrapper" style={{ width: '30%', cursor: 'pointer' }}>
+      <div className="slider-wrapper" style={{ width: '20%', cursor: 'pointer' }}>
         {/* Temperature label with selected value */}
         <div style={{ display: 'flex', alignItems: 'center' }}>
         <label htmlFor="temperature">
@@ -79,7 +84,7 @@ export default function Home() {
           style={{width: '12px', height: '12px', marginLeft: '8px'}}
         />
       </div>
-
+      
         {/* Slider for Temperature */}
         <Slider
           defaultValue={[0]}
@@ -89,6 +94,8 @@ export default function Home() {
           onValueChange={(value) => setTemperatureValue(value[0])} // Update state when slider value changes
         />
       </div>
+      
+      <ComboboxDemo/>
       <ChatSection />
       
     </main>
