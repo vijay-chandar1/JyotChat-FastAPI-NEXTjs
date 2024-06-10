@@ -100,11 +100,15 @@ async def chat(
 
     async def content_generator():
         # Yield the text response
+        full_response = ''
         async def _text_generator():
+            nonlocal full_response
             async for token in response.async_response_gen():
                 yield VercelStreamResponse.convert_text(token)
+                full_response += token
             # the text_generator is the leading stream, once it's finished, also finish the event stream
             event_handler.is_done = True
+            print(f"Generated response: {full_response}")
 
         # Yield the events from the event handler
         async def _event_generator():

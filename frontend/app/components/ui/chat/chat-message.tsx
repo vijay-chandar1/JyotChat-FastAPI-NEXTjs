@@ -94,6 +94,7 @@ export default function ChatMessage({
   isLoading: boolean;
 }) {
   const { isCopied, copyToClipboard } = useCopyToClipboard({ timeout: 2000 });
+  
   return (
     <div className="flex items-start gap-4 pr-5 pt-5">
       <ChatAvatar role={chatMessage.role} />

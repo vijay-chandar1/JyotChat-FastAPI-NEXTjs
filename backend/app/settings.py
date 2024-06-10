@@ -18,7 +18,7 @@ def init_settings():
     else:
         raise ValueError(f"Invalid model provider: {model_provider}")
     Settings.chunk_size = int(os.getenv("CHUNK_SIZE", "512"))
-    Settings.chunk_overlap = int(os.getenv("CHUNK_OVERLAP", "256")) #256
+    Settings.chunk_overlap = int(os.getenv("CHUNK_OVERLAP", "20")) #256
 
 
 def init_ollama():
@@ -93,25 +93,30 @@ def init_gemini():
         model_name=embed_model_map[os.getenv("EMBEDDING_MODEL")]
     )
 
-def init_cohere(model_name="cohere", temperature=os.getenv("LLM_TEMPERATURE", 0)):
+def init_cohere(model_name=os.getenv("MODEL_PROVIDER"), temperature=os.getenv("LLM_TEMPERATURE", 0)):
     from llama_index.llms.litellm import LiteLLM
     from llama_index.embeddings.cohere import CohereEmbedding
 
+        
     if model_name == "cohere":
         Settings.embed_model = CohereEmbedding( cohere_api_key=os.getenv("COHERE_API_KEY"),
                                                 model_name=os.getenv("EMBEDDING_MODEL"),
                                                 input_type="search_query",
                                                 embedding_type="float",
                                                 )  
+
         Settings.llm = LiteLLM(  api_key=os.getenv("COHERE_API_KEY"),
                                  model=os.getenv("MODEL"),
                                  temperature=temperature,
                                  )
     elif model_name == "llama":
-        Settings.llm = LiteLLM(model="anyscale/meta-llama/Llama-2-70b-chat-hf",
+        Settings.llm = LiteLLM(model="anyscale/meta-llama/Llama-3-70b-chat-hf",
                                temperature=temperature,)
     elif model_name == "openai":
         Settings.llm = LiteLLM(model = "gpt-4o",
+                               temperature=temperature,)
+    elif model_name == "gemini":
+        Settings.llm = LiteLLM(model = "gemini/gemini-1.5-pro-latest",
                                temperature=temperature,)
     else:
         raise ValueError(f"Invalid model name: {model_name}")
@@ -148,4 +153,4 @@ def init_cohere(model_name="cohere", temperature=os.getenv("LLM_TEMPERATURE", 0)
 #                             #  preamble=preamble,    
 #                             )
 # # anyscale/meta-llama/Llama-2-70b-chat-hf
- 
+#  messages = [ ChatMessage( role="system", content="{context_str}" ), ChatMessage(role="user", content="{user_query}")]

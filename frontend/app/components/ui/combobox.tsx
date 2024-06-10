@@ -32,11 +32,15 @@ const frameworks = [
     value: "llama",
     label: "llama",
   },
+  {
+    value: "gemini",
+    label: "gemini",
+  },
 ]
 
 export function ComboboxDemo() {
   const [open, setOpen] = React.useState(false)
-  const [value, setValue] = React.useState("")
+  const [value, setValue] = React.useState("cohere")
   const BASE_URL = process.env.REACT_APP_BASE_URL || 'http://localhost:8000';
 
   return (

@@ -14,6 +14,7 @@ from app.observability import init_observability
 from app.settings import init_cohere 
 from pydantic import BaseModel
 from app.engine import update_top_k
+
 app = FastAPI()
 
 init_settings()
@@ -31,7 +32,7 @@ class ModelSelection(BaseModel):
 
 # Function to update temperature in settings
 def update_temperature(temperature: float):
-    init_cohere(temperature)  # Update temperature in settings
+    init_cohere(temperature=temperature)  # Update temperature in settings
 
 # Function to update topK in settings
 def update_topK(topK: int):
@@ -56,8 +57,9 @@ if environment == "dev":
 
 @app.post("/update_temperature")
 async def update_temperature_endpoint(update: TemperatureUpdate):
-    update_temperature(update.temperature)
+    update_temperature(temperature=update.temperature)
     return {"message": "Temperature updated successfully"}
+
 
 @app.post("/update_topk")
 async def update_topk_endpoint(update: TopKUpdate):
@@ -67,7 +69,7 @@ async def update_topk_endpoint(update: TopKUpdate):
 @app.post("/select_model")
 async def select_model_endpoint(selection: ModelSelection):
     # Call the function to update the model in settings
-    init_cohere(selection.model)
+    init_cohere(model_name=selection.model)
     return {"message": "Model updated successfully"}
 
 app.include_router(chat_router, prefix="/api/chat")
