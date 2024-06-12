@@ -84,7 +84,7 @@ async def parse_chat_data(data: _ChatData) -> Tuple[str, List[ChatMessage]]:
     ]
     return last_message.content, messages
 
-
+responses = {}
 # # streaming endpoint - delete if not needed
 @r.post("")
 async def chat(
@@ -109,6 +109,9 @@ async def chat(
             # the text_generator is the leading stream, once it's finished, also finish the event stream
             event_handler.is_done = True
             print(f"Generated response: {full_response}")
+
+                # Store the full response in the dictionary
+            responses[request.client.host] = full_response
 
         # Yield the events from the event handler
         async def _event_generator():

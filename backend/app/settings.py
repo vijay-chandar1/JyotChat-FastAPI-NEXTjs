@@ -109,17 +109,20 @@ def init_cohere(model_name=os.getenv("MODEL_PROVIDER"), temperature=os.getenv("L
                                  model=os.getenv("MODEL"),
                                  temperature=temperature,
                                  )
-    elif model_name == "llama":
-        Settings.llm = LiteLLM(model="anyscale/meta-llama/Llama-3-70b-chat-hf",
-                               temperature=temperature,)
+
     elif model_name == "openai":
         Settings.llm = LiteLLM(model = "gpt-4o",
                                temperature=temperature,)
-    elif model_name == "gemini":
-        Settings.llm = LiteLLM(model = "gemini/gemini-1.5-pro-latest",
-                               temperature=temperature,)
+
     else:
         raise ValueError(f"Invalid model name: {model_name}")
+    
+    # elif model_name == "llama":
+    #     Settings.llm = LiteLLM(model="anyscale/meta-llama/Llama-3-70b-chat-hf",
+    #                            temperature=temperature,)
+    # elif model_name == "gemini":
+    #     Settings.llm = LiteLLM(model = "gemini/gemini-1.5-pro-latest",
+    #                            temperature=temperature,)
 
 
 # def init_cohere(temperature=os.getenv("LLM_TEMPERATURE", 0)):

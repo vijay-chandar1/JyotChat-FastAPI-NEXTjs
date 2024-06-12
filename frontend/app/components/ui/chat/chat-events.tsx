@@ -1,5 +1,5 @@
 import { ChevronDown, ChevronRight, Loader2 } from "lucide-react";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Button } from "../button";
 import {
   Collapsible,
@@ -7,7 +7,9 @@ import {
   CollapsibleTrigger,
 } from "../collapsible";
 import { EventData } from "./index";
-
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faVolumeHigh, faStopCircle } from '@fortawesome/free-solid-svg-icons'
+import axios from 'axios';
 export function ChatEvents({
   data,
   isLoading,
@@ -16,6 +18,8 @@ export function ChatEvents({
   isLoading: boolean;
 }) {
   const [isOpen, setIsOpen] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const audioElement = useRef<HTMLAudioElement | null>(null);
 
   const buttonLabel = isOpen ? "Hide events" : "Show events";
 
@@ -24,6 +28,37 @@ export function ChatEvents({
   ) : (
     <ChevronRight className="h-4 w-4" />
   );
+
+  const handleAudioControl = async () => {
+    const BASE_URL = process.env.REACT_APP_BASE_URL || 'http://localhost:8000';
+    try {
+      if (isPlaying) {
+        // If audio is playing, stop it
+        if (audioElement.current) {
+          audioElement.current.pause();
+        }
+      } else {
+        // If audio is not playing, play it
+        const response = await axios.post(`${BASE_URL}/play_audio`, {}, { responseType: 'arraybuffer' });
+        if (response.data) {
+          const blob = new Blob([response.data], { type: 'audio/mpeg' });
+          const url = URL.createObjectURL(blob);
+          console.log(url);
+          audioElement.current = new Audio(url);
+          console.log(audioElement.current);
+          audioElement.current.play();
+
+          audioElement.current.addEventListener('ended', () => {
+            setIsPlaying(false);
+          });
+        }
+      }
+      // Update isPlaying state
+      setIsPlaying(!isPlaying);
+    } catch (error) {
+      console.error('Error controlling audio:', error);
+    }
+  }
 
   return (
     <div className="border-l-2 border-indigo-400 pl-2">
@@ -43,6 +78,12 @@ export function ChatEvents({
           </div>
         </CollapsibleContent>
       </Collapsible>
+      <FontAwesomeIcon 
+      icon={isPlaying ? faStopCircle : faVolumeHigh} 
+      size="sm" 
+      onClick={handleAudioControl}
+      style={{ cursor: 'pointer' }}/>
+      
     </div>
   );
 }

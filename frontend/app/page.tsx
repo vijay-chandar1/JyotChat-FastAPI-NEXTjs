@@ -3,14 +3,25 @@ import Header from "@/app/components/header";
 import ChatSection from "./components/chat-section";
 import { useState, useEffect } from "react";
 import { Slider } from "./components/ui/slider";
-import { ComboboxDemo } from "./components/ui/combobox";
+// import { ComboboxDemo } from "./components/ui/combobox";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "./components/ui/select"
 import axios from "axios";
 
 export default function Home() {
   // State to hold the current value of each slider
+  const [selectedModel, setSelectedModel] = useState<'cohere' | 'openai' | null>('cohere');
   const [topKValue, setTopKValue] = useState(3);
   const [temperatureValue, setTemperatureValue] = useState(0);
   const BASE_URL = process.env.REACT_APP_BASE_URL || 'http://localhost:8000';
+  const handleModelSelection = (value: string) => {
+    setSelectedModel(value as 'cohere' | 'openai' | null);
+  }
   useEffect(() => {
     // Define a function to make the API call to update temperature
     const updateTemperatureBackend = async () => {
@@ -41,6 +52,27 @@ export default function Home() {
     // Call the function to update the backend when topK value changes
     updateTopKBackend();
   }, [temperatureValue, topKValue]);
+  
+  useEffect(() => {
+    // If no model is selected, return early
+    if (!selectedModel) {
+      return;
+    }
+
+    // Define a function to make the API call to update the model
+    const updateModelBackend = async () => {
+      try {
+        await axios.post(`${BASE_URL}/select_model`, {
+          model: selectedModel
+        });
+        console.log('Model updated in the backend successfully!');
+      } catch (error) {
+        console.error('Error updating model in the backend:', error);
+      }
+    };
+
+    updateModelBackend();
+  }, [selectedModel]);
 
   return (
     <main className="flex min-h-screen flex-col items-center gap-10 pt-5 p-24 background-gradient">
@@ -94,8 +126,18 @@ export default function Home() {
           onValueChange={(value) => setTemperatureValue(value[0])} // Update state when slider value changes
         />
       </div>
-      
-      <ComboboxDemo/>
+      <Select onValueChange={handleModelSelection} defaultValue="cohere">
+        <SelectTrigger className="w-[180px]">
+          <SelectValue>{selectedModel}</SelectValue>
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="cohere">cohere</SelectItem>
+          <SelectItem value="openai">openai</SelectItem>
+          {/* <SelectItem value="llama">llama</SelectItem> */}
+        </SelectContent>
+    </Select>
+
+      {/* <ComboboxDemo/> */}
       <ChatSection />
       
     </main>
