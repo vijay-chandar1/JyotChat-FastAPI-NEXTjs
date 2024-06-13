@@ -1,7 +1,7 @@
 "use client"
 import Header from "@/app/components/header";
 import ChatSection from "./components/chat-section";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Slider } from "./components/ui/slider";
 // import { ComboboxDemo } from "./components/ui/combobox";
 import {
@@ -22,6 +22,7 @@ export default function Home() {
   const handleModelSelection = (value: string) => {
     setSelectedModel(value as 'cohere' | 'openai' | null);
   }
+
   useEffect(() => {
     // Define a function to make the API call to update temperature
     const updateTemperatureBackend = async () => {

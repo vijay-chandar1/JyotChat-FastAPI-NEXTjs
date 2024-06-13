@@ -5,7 +5,7 @@ load_dotenv()
 import logging
 import os
 import uvicorn
-from fastapi import FastAPI, HTTPException, Request, BackgroundTasks
+from fastapi import FastAPI, HTTPException, Request, BackgroundTasks, Body
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse, FileResponse
 from app.api.routers.chat import chat_router
@@ -19,6 +19,7 @@ from gtts import gTTS
 from langdetect import detect
 import os
 import uuid
+from easygoogletranslate import EasyGoogleTranslate
 
 app = FastAPI()
 
@@ -101,6 +102,23 @@ async def play_audio_endpoint(request: Request, background_tasks: BackgroundTask
     except Exception as e:
         print(str(e))  # Log the error
         raise HTTPException(status_code=500, detail="An error occurred while processing the request.")
+
+@app.post("/translate")
+async def translate_text(text: str = Body(..., embed=True), target_language: str = Body('en', embed=True)):
+    print(f"Translating text: {text} to language: {target_language}")  # Print the text and target language
+    translator = EasyGoogleTranslate(source_language='auto', target_language='target_language')
+    try:
+        translated_text = translator.translate(text)
+    except Exception as e:
+        print(f"Error: {str(e)}")  # Print the error message
+        raise HTTPException(status_code=500, detail=str(e))
+
+    print(f"Translated text: {translated_text}")  # Print the translated text
+    return {"translated_text": translated_text}
+
+
+
+
 
 
 app.include_router(chat_router, prefix="/api/chat")
