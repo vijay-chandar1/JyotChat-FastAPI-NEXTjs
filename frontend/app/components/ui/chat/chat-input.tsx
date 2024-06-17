@@ -4,6 +4,11 @@ import FileUploader from "../file-uploader";
 import { Input } from "../input";
 import UploadImagePreview from "../upload-image-preview";
 import { ChatHandler } from "./chat.interface";
+import { Switch } from "../switch";
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,} from "../hover-card"
 
 export default function ChatInput(
   props: Pick<
@@ -16,6 +21,8 @@ export default function ChatInput(
     | "handleInputChange"
   > & {
     multiModal?: boolean;
+    isToggled: boolean;
+    handleToggle: () => void;
   },
 ) {
   const [imageUrl, setImageUrl] = useState<string | null>(null);
@@ -71,10 +78,19 @@ export default function ChatInput(
           value={props.input}
           onChange={props.handleInputChange}
         />
-        <FileUploader
+        {/* <FileUploader
           onFileUpload={handleUploadFile}
           onFileError={props.onFileError}
-        />
+        /> */}
+        <HoverCard>
+          <HoverCardTrigger>        
+            <Switch checked={props.isToggled} onCheckedChange={props.handleToggle} />
+          </HoverCardTrigger>
+            <HoverCardContent>
+              Toggle for translation
+            </HoverCardContent>
+        </HoverCard>
+
         <Button type="submit" disabled={props.isLoading}>
           Send message
         </Button>

@@ -1,7 +1,7 @@
 "use client"
 import Header from "@/app/components/header";
 import ChatSection from "./components/chat-section";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { Slider } from "./components/ui/slider";
 // import { ComboboxDemo } from "./components/ui/combobox";
 import {
@@ -12,6 +12,11 @@ import {
   SelectValue,
 } from "./components/ui/select"
 import axios from "axios";
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "./components/ui/hovercard";
 
 export default function Home() {
   // State to hold the current value of each slider
@@ -91,10 +96,18 @@ export default function Home() {
         <label htmlFor="topK">
           Top K: {topKValue}
         </label>
-        <img 
-          src="/info.png" title="Top K refers to the number of most probable alternatives that the model will consider while making predictions. A higher value of K means the model considers more alternatives, which might make the model slower but potentially more accurate." 
+        <HoverCard>
+          <HoverCardTrigger>
+          <img 
+          src="/info.png" 
           style={{width: '12px', height: '12px', marginLeft: '8px'}}
         />
+          </HoverCardTrigger>
+          <HoverCardContent>
+          Uses the most relevant results based on ranking
+          </HoverCardContent>
+        </HoverCard>
+        
       </div>
         {/* Slider for TopK */}
         <Slider
@@ -111,11 +124,17 @@ export default function Home() {
         <label htmlFor="temperature">
           Temperature: {temperatureValue}
         </label>
-        <img 
+        <HoverCard>
+          <HoverCardTrigger>
+          <img 
           src="/info.png" 
-          title="Temperature is a parameter of the model that controls the randomness of the predictions. A higher temperature value results in more random predictions, while a lower value makes the predictions more deterministic." 
           style={{width: '12px', height: '12px', marginLeft: '8px'}}
         />
+          </HoverCardTrigger>
+          <HoverCardContent>
+          Controls model creativity and response diversity
+          </HoverCardContent>
+        </HoverCard>
       </div>
       
         {/* Slider for Temperature */}

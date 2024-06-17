@@ -1,6 +1,7 @@
 import { ChevronDown, ChevronRight, Loader2 } from "lucide-react";
 import { useState, useRef } from "react";
 import { Button } from "../button";
+// import { Switch } from "../switch"
 import {
   Collapsible,
   CollapsibleContent,
@@ -13,9 +14,13 @@ import axios from 'axios';
 export function ChatEvents({
   data,
   isLoading,
+  // isToggled, // Receive isToggled as prop
+  // handleToggle, // Receive handleToggle as prop
 }: {
   data: EventData[];
   isLoading: boolean;
+  // isToggled: boolean;
+  // handleToggle: () => void;
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -77,13 +82,16 @@ export function ChatEvents({
             ))}
           </div>
         </CollapsibleContent>
+        {/* <br>
+        </br>
+        <Switch/> */}
+      {/* <Switch checked={isToggled} onCheckedChange={handleToggle} /> */}
       </Collapsible>
       <FontAwesomeIcon 
       icon={isPlaying ? faStopCircle : faVolumeHigh} 
       size="sm" 
       onClick={handleAudioControl}
-      style={{ cursor: 'pointer' }}/>
-      
+      style={{ cursor: 'pointer' }}/>      
     </div>
   );
 }

@@ -5,7 +5,7 @@ load_dotenv()
 import logging
 import os
 import uvicorn
-from fastapi import FastAPI, HTTPException, Request, BackgroundTasks, Body
+from fastapi import FastAPI, HTTPException, Request, BackgroundTasks, Body, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse, FileResponse
 from app.api.routers.chat import chat_router
@@ -20,6 +20,8 @@ from langdetect import detect
 import os
 import uuid
 from easygoogletranslate import EasyGoogleTranslate
+import azure.cognitiveservices.speech as speechsdk
+
 
 app = FastAPI()
 
@@ -103,6 +105,82 @@ async def play_audio_endpoint(request: Request, background_tasks: BackgroundTask
         print(str(e))  # Log the error
         raise HTTPException(status_code=500, detail="An error occurred while processing the request.")
 
+
+
+
+# responses = {
+#     "127.0.0.1": "Hello, this is a test response.",
+#     "127.0.0.2": "નમસ્તે, આ એક પરીક્ષણ પ્રતિસાદ છે."  # Example response in Gujarati
+#     # Add other client responses as needed
+# }
+
+# # Azure TTS credentials from environment variables
+# subscription_key = os.getenv("AZURE_SPEECH_KEY")
+# region = os.getenv("AZURE_REGION")
+
+# # Define a function to select the appropriate voice based on language
+# def get_voice_for_language(lang: str, preferred_voice: str = "hi-IN-MadhurNeural") -> str:
+#     if lang == "gu":
+#         return "gu-IN-DhwaniNeural"  # Example Gujarati voice
+#     elif lang == "en":
+#         return "en-IN-NeerjaNeural"  # Example Indian English female voice
+#     else:
+#         return preferred_voice
+
+# @app.post("/play_audio")
+# async def play_audio_endpoint(
+#     request: Request,
+#     background_tasks: BackgroundTasks,
+#     voice: str = Query(None)
+# ):
+#     full_response = responses.get(request.client.host)
+#     try:
+#         # Detect the language of full_response
+#         lang = detect(full_response)
+
+#         # Set up the speech config with your subscription and region
+#         speech_config = speechsdk.SpeechConfig(subscription=subscription_key, region=region)
+
+#         # Select the appropriate voice for the detected language
+#         if voice:
+#             speech_config.speech_synthesis_voice_name = voice
+#         else:
+#             speech_config.speech_synthesis_voice_name = get_voice_for_language(lang)
+
+#         # Create a unique file name for the speech output
+#         speech_file_path = f"speech_{uuid.uuid4()}.mp3"
+
+#         # Set up the audio output config to write to the file
+#         audio_output = speechsdk.audio.AudioOutputConfig(filename=speech_file_path)
+
+#         # Create a speech synthesizer
+#         synthesizer = speechsdk.SpeechSynthesizer(speech_config=speech_config, audio_config=audio_output)
+
+#         # Synthesize the text to speech
+#         result = synthesizer.speak_text_async(full_response).get()
+
+#         if result.reason == speechsdk.ResultReason.SynthesizingAudioCompleted:
+#             # Return the audio file
+#             response = FileResponse(speech_file_path, media_type="audio/mpeg")
+#             # Schedule the file to be deleted after the response has been sent
+#             background_tasks.add_task(os.remove, speech_file_path)
+#             return response
+#         elif result.reason == speechsdk.ResultReason.Canceled:
+#             cancellation_details = result.cancellation_details
+#             raise Exception(f"Speech synthesis canceled: {cancellation_details.reason}. Error details: {cancellation_details.error_details}")
+#         else:
+#             raise Exception(f"Speech synthesis failed: {result.reason}")
+
+#     except Exception as e:
+#         print(f"Error: {str(e)}")  # Log the error
+#         raise HTTPException(status_code=500, detail=f"An error occurred while processing the request: {str(e)}")
+    
+
+
+
+
+
+    
 @app.post("/translate")
 async def translate_text(text: str = Body(..., embed=True), target_language: str = Body('en', embed=True)):
     print(f"Translating text: {text} to language: {target_language}")  # Print the text and target language

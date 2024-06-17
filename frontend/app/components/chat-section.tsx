@@ -75,10 +75,11 @@ export default function ChatSection() {
         handleInputChange={handleInputChange}
         isLoading={isLoading}
         multiModal={true}
+        isToggled={isToggled} // Pass isToggled state as prop
+        handleToggle={handleToggle} // Pass handleToggle function as prop
       />
-      <Switch checked={isToggled} onCheckedChange={handleToggle} />
-
-      <p>{isToggled ? 'Show Original' : 'Show Translated'}</p>
+      {/* <Switch checked={isToggled} onCheckedChange={handleToggle} />
+      <p>{isToggled ? 'Show Original' : 'Show Translated'}</p> */}
     </div>
   );
 }
