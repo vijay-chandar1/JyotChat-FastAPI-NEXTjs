@@ -21,6 +21,7 @@ import os
 import uuid
 from easygoogletranslate import EasyGoogleTranslate
 import azure.cognitiveservices.speech as speechsdk
+import asyncio
 
 
 app = FastAPI()
@@ -82,101 +83,100 @@ async def select_model_endpoint(selection: ModelSelection):
     init_cohere(model_name=selection.model)
     return {"message": "Model updated successfully"}
 
-@app.post("/play_audio")
-async def play_audio_endpoint(request: Request, background_tasks: BackgroundTasks):
-    full_response = responses.get(request.client.host)
-    try:
-        # Detect the language of full_response
-        lang = detect(full_response)
-        
-        # Convert full_response to speech using gTTS
-        tts = gTTS(text=full_response, lang=lang, tld="co.in")
-        speech_file_path = f"speech_{uuid.uuid4()}.mp3"
-        tts.save(speech_file_path)
-        
-        # Return the audio file
-        response = FileResponse(speech_file_path, media_type="audio/mpeg")
-
-        # Schedule the file to be deleted after the response has been sent
-        background_tasks.add_task(os.remove, speech_file_path)
-
-        return response
-    except Exception as e:
-        print(str(e))  # Log the error
-        raise HTTPException(status_code=500, detail="An error occurred while processing the request.")
-
-
-
-
-# responses = {
-#     "127.0.0.1": "Hello, this is a test response.",
-#     "127.0.0.2": "નમસ્તે, આ એક પરીક્ષણ પ્રતિસાદ છે."  # Example response in Gujarati
-#     # Add other client responses as needed
-# }
-
-# # Azure TTS credentials from environment variables
-# subscription_key = os.getenv("AZURE_SPEECH_KEY")
-# region = os.getenv("AZURE_REGION")
-
-# # Define a function to select the appropriate voice based on language
-# def get_voice_for_language(lang: str, preferred_voice: str = "hi-IN-MadhurNeural") -> str:
-#     if lang == "gu":
-#         return "gu-IN-DhwaniNeural"  # Example Gujarati voice
-#     elif lang == "en":
-#         return "en-IN-NeerjaNeural"  # Example Indian English female voice
-#     else:
-#         return preferred_voice
-
 # @app.post("/play_audio")
-# async def play_audio_endpoint(
-#     request: Request,
-#     background_tasks: BackgroundTasks,
-#     voice: str = Query(None)
-# ):
+# async def play_audio_endpoint(request: Request, background_tasks: BackgroundTasks):
 #     full_response = responses.get(request.client.host)
 #     try:
 #         # Detect the language of full_response
 #         lang = detect(full_response)
-
-#         # Set up the speech config with your subscription and region
-#         speech_config = speechsdk.SpeechConfig(subscription=subscription_key, region=region)
-
-#         # Select the appropriate voice for the detected language
-#         if voice:
-#             speech_config.speech_synthesis_voice_name = voice
-#         else:
-#             speech_config.speech_synthesis_voice_name = get_voice_for_language(lang)
-
-#         # Create a unique file name for the speech output
+        
+#         # Convert full_response to speech using gTTS
+#         tts = gTTS(text=full_response, lang=lang, tld="co.in")
 #         speech_file_path = f"speech_{uuid.uuid4()}.mp3"
+#         tts.save(speech_file_path)
+        
+#         # Return the audio file
+#         response = FileResponse(speech_file_path, media_type="audio/mpeg")
 
-#         # Set up the audio output config to write to the file
-#         audio_output = speechsdk.audio.AudioOutputConfig(filename=speech_file_path)
+#         # Schedule the file to be deleted after the response has been sent
+#         background_tasks.add_task(os.remove, speech_file_path)
 
-#         # Create a speech synthesizer
-#         synthesizer = speechsdk.SpeechSynthesizer(speech_config=speech_config, audio_config=audio_output)
-
-#         # Synthesize the text to speech
-#         result = synthesizer.speak_text_async(full_response).get()
-
-#         if result.reason == speechsdk.ResultReason.SynthesizingAudioCompleted:
-#             # Return the audio file
-#             response = FileResponse(speech_file_path, media_type="audio/mpeg")
-#             # Schedule the file to be deleted after the response has been sent
-#             background_tasks.add_task(os.remove, speech_file_path)
-#             return response
-#         elif result.reason == speechsdk.ResultReason.Canceled:
-#             cancellation_details = result.cancellation_details
-#             raise Exception(f"Speech synthesis canceled: {cancellation_details.reason}. Error details: {cancellation_details.error_details}")
-#         else:
-#             raise Exception(f"Speech synthesis failed: {result.reason}")
-
+#         return response
 #     except Exception as e:
-#         print(f"Error: {str(e)}")  # Log the error
-#         raise HTTPException(status_code=500, detail=f"An error occurred while processing the request: {str(e)}")
+#         print(str(e))  # Log the error
+#         raise HTTPException(status_code=500, detail="An error occurred while processing the request.")
+
+
+# Set up your Azure subscription key and service region
+def synthesize_speech(text: str, lang: str, output_file: str):
+    # Set up Azure Cognitive Services Speech SDK configuration
+    speech_key = os.getenv("AZURE_SPEECH_KEY")
     
+    service_region = os.getenv("AZURE_REGION")
+    
+    speech_config = speechsdk.SpeechConfig(subscription=speech_key, region=service_region)
+    # Use language-specific voice
+    if lang == "hi":
+        voice_name = "hi-IN-MadhurNeural"
+    elif lang == "gu":
+        voice_name = "gu-IN-NiranjanNeural"
+    else:
+        voice_name = "en-US-AriaNeural"  # Default to English
+    speech_config.speech_synthesis_voice_name = voice_name
 
+    # Create an audio output configuration
+    audio_config = speechsdk.audio.AudioOutputConfig(filename=output_file)
+    speech_synthesizer = speechsdk.SpeechSynthesizer(speech_config=speech_config, audio_config=audio_config)
 
+    # Synthesize speech and get the result
+    result = speech_synthesizer.speak_text_async(text).get()
+
+    # Check if the synthesis was successful
+    if result.reason == speechsdk.ResultReason.SynthesizingAudioCompleted:
+        print(f"Speech synthesis completed successfully. Audio saved to {output_file}")
+    else:
+        print("Speech synthesis failed.")
+        if result.reason == speechsdk.ResultReason.Canceled:
+            cancellation_details = result.cancellation_details
+            print(f"Speech synthesis canceled: {cancellation_details.reason}")
+            if cancellation_details.reason == speechsdk.CancellationReason.Error and cancellation_details.error_details:
+                print(f"Error details: {cancellation_details.error_details}")
+
+# async def delete_file_after_delay(file_path: str, delay: int = 10):
+#     await asyncio.sleep(delay)
+#     try:
+#         os.remove(file_path)
+#         print(f"File {file_path} deleted successfully.")
+#     except Exception as e:
+#         print(f"Error deleting file {file_path}: {e}")
+
+@app.post("/play_audio")
+async def play_audio_endpoint(request: Request, background_tasks: BackgroundTasks):
+    full_response = responses.get(request.client.host)
+    
+    if not full_response:
+        raise HTTPException(status_code=404, detail="Response not found for the client")
+
+    try:
+        # Detect the language of full_response
+        lang = detect(full_response)
+
+        # Generate a unique filename for the speech file
+        speech_file_path = f"speech_{uuid.uuid4()}.wav"
+        
+        # Convert full_response to speech using Azure Text-to-Speech
+        synthesize_speech(full_response, lang, speech_file_path)
+        
+        # Return the audio file
+        response = FileResponse(speech_file_path, media_type="audio/wav")
+        
+        # Schedule the file to be deleted after a delay
+        background_tasks.add_task(os.remove, speech_file_path)
+        
+        return response
+    except Exception as e:
+        print(str(e))  # Log the error
+        raise HTTPException(status_code=500, detail="An error occurred while processing the request.")
 
 
 
