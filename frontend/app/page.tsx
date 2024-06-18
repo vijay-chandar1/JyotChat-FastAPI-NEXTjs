@@ -17,6 +17,13 @@ import {
   HoverCardContent,
   HoverCardTrigger,
 } from "./components/ui/hovercard";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "./components/ui/collapsible"
+import { Button } from "./components/ui/button"
+
 
 export default function Home() {
   // State to hold the current value of each slider
@@ -86,12 +93,13 @@ export default function Home() {
       <Header />
       </div>
 
-
-
-      {/* <label htmlFor="custom-settings">Custom Settings</label> */}
-
-      <div className="slider-wrapper" style={{ width: '20%', cursor: 'pointer' }}>
+      <Collapsible>
+        <CollapsibleTrigger><Button variant="outline">Custom Settings</Button>
+        </CollapsibleTrigger>
+        <CollapsibleContent>
+          {/* <div className="slider-wrapper" style={{ width: '20%', cursor: 'pointer' }}> */}
         {/* TopK label with selected value */}
+        <br></br>
         <div style={{ display: 'flex', alignItems: 'center' }}>
         <label htmlFor="topK">
           Top K: {topKValue}
@@ -100,7 +108,7 @@ export default function Home() {
           <HoverCardTrigger>
           <img 
           src="/info.png" 
-          style={{width: '12px', height: '12px', marginLeft: '8px'}}
+          style={{width: '12px', height: '12px', marginLeft: '8px', cursor: 'pointer'}}
         />
           </HoverCardTrigger>
           <HoverCardContent>
@@ -117,8 +125,9 @@ export default function Home() {
           step={1}
           onValueChange={(value) => setTopKValue(value[0])} // Update state when slider value changes
         />
-      </div>
-      <div className="slider-wrapper" style={{ width: '20%', cursor: 'pointer' }}>
+        <br></br>
+      {/* </div> */}
+      {/* <div className="slider-wrapper" style={{ width: '20%', cursor: 'pointer' }}> */}
         {/* Temperature label with selected value */}
         <div style={{ display: 'flex', alignItems: 'center' }}>
         <label htmlFor="temperature">
@@ -128,7 +137,7 @@ export default function Home() {
           <HoverCardTrigger>
           <img 
           src="/info.png" 
-          style={{width: '12px', height: '12px', marginLeft: '8px'}}
+          style={{width: '12px', height: '12px', marginLeft: '8px', cursor: 'pointer'}}
         />
           </HoverCardTrigger>
           <HoverCardContent>
@@ -145,18 +154,33 @@ export default function Home() {
           step={0.1}
           onValueChange={(value) => setTemperatureValue(value[0])} // Update state when slider value changes
         />
-      </div>
-      <Select onValueChange={handleModelSelection} defaultValue="cohere">
-        <SelectTrigger className="w-[180px]">
-          <SelectValue>{selectedModel}</SelectValue>
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="cohere">cohere</SelectItem>
-          <SelectItem value="openai">openai</SelectItem>
-          {/* <SelectItem value="llama">llama</SelectItem> */}
-        </SelectContent>
-    </Select>
+      {/* </div> */}
+      <br></br>
+      <HoverCard>
+          <HoverCardTrigger>
+          <Select onValueChange={handleModelSelection} defaultValue="cohere">
+            <SelectTrigger className="w-[180px]">
+              <SelectValue>{selectedModel}</SelectValue>
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="cohere">cohere</SelectItem>
+              <SelectItem value="openai">openai</SelectItem>
+              {/* <SelectItem value="llama">llama</SelectItem> */}
+            </SelectContent>
+          </Select>
+          </HoverCardTrigger>
+        <HoverCardContent>
+        Select Model
+        </HoverCardContent>
+      </HoverCard>
 
+
+        </CollapsibleContent>
+      </Collapsible>
+
+      {/* <label htmlFor="custom-settings">Custom Settings</label> */}
+
+      
       {/* <ComboboxDemo/> */}
       <ChatSection />
       
