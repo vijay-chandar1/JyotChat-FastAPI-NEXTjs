@@ -94,7 +94,10 @@ export default function Home() {
       </div>
 
       <Collapsible>
-        <CollapsibleTrigger><Button variant="outline">Custom Settings</Button>
+        <CollapsibleTrigger>
+        Custom Settings
+        {/* <Button variant="outline">Custom Settings</Button> */}
+
         </CollapsibleTrigger>
         <CollapsibleContent>
           {/* <div className="slider-wrapper" style={{ width: '20%', cursor: 'pointer' }}> */}

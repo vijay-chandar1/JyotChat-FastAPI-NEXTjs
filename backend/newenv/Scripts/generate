@@ -1,0 +1,6 @@
+#!D:\Fresh\chatbot-final\nextjs-fastapi\backend\newenv\Scripts\python.exe
+import sys
+from app.engine.generate import generate_datasource
+
+if __name__ == '__main__':
+    sys.exit(generate_datasource())

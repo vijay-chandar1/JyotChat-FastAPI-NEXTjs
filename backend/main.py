@@ -15,13 +15,13 @@ from app.settings import init_cohere
 from pydantic import BaseModel
 from app.engine import update_top_k
 from app.api.routers.chat import responses
-from gtts import gTTS
+# from gtts import gTTS
 from langdetect import detect
 import os
 import uuid
 from easygoogletranslate import EasyGoogleTranslate
 import azure.cognitiveservices.speech as speechsdk
-import asyncio
+# import asyncio
 
 
 app = FastAPI()

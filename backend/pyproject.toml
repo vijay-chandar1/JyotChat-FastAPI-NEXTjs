@@ -18,6 +18,9 @@ llama-index = "0.10.28"
 llama-index-core = "0.10.28"
 llama-index-embeddings-cohere = "^0.1.8"
 llama-index-llms-litellm = "^0.1.4"
+langdetect = "^1.0.9"
+easygoogletranslate = "^0.0.4"
+azure-cognitiveservices-speech = "^1.38.0"
 
 [tool.poetry.dependencies.uvicorn]
 extras = [ "standard" ]
