@@ -83,6 +83,96 @@ async def select_model_endpoint(selection: ModelSelection):
     init_cohere(model_name=selection.model)
     return {"message": "Model updated successfully"}
 
+# Set up your Azure subscription key and service region
+def synthesize_speech(text: str, lang: str, output_file: str):
+    # Set up Azure Cognitive Services Speech SDK configuration
+    speech_key = os.getenv("AZURE_SPEECH_KEY")
+    
+    service_region = os.getenv("AZURE_REGION")
+    
+    speech_config = speechsdk.SpeechConfig(subscription=speech_key, region=service_region)
+    # Use language-specific voice
+    if lang == "hi":
+        voice_name = "hi-IN-MadhurNeural"
+    elif lang == "gu":
+        voice_name = "gu-IN-NiranjanNeural"
+    else:
+        voice_name = "en-IN-PrabhatNeural"  # Default to English
+    speech_config.speech_synthesis_voice_name = voice_name
+
+    # Create an audio output configuration
+    audio_config = speechsdk.audio.AudioOutputConfig(filename=output_file)
+    speech_synthesizer = speechsdk.SpeechSynthesizer(speech_config=speech_config, audio_config=audio_config)
+
+    # Synthesize speech and get the result
+    result = speech_synthesizer.speak_text_async(text).get()
+
+    # Check if the synthesis was successful
+    if result.reason == speechsdk.ResultReason.SynthesizingAudioCompleted:
+        print(f"Speech synthesis completed successfully. Audio saved to {output_file}")
+    else:
+        print("Speech synthesis failed.")
+        if result.reason == speechsdk.ResultReason.Canceled:
+            cancellation_details = result.cancellation_details
+            print(f"Speech synthesis canceled: {cancellation_details.reason}")
+            if cancellation_details.reason == speechsdk.CancellationReason.Error and cancellation_details.error_details:
+                print(f"Error details: {cancellation_details.error_details}")
+
+
+@app.post("/play_audio")
+async def play_audio_endpoint(request: Request, background_tasks: BackgroundTasks):
+    try:
+        data = await request.json()
+        message = data.get('message')
+        
+        if not message:
+            raise HTTPException(status_code=400, detail="Message content is required")
+
+        lang = detect(message)
+        speech_file_path = f"speech_{uuid.uuid4()}.wav"
+        synthesize_speech(message, lang, speech_file_path)
+        
+        response = FileResponse(speech_file_path, media_type="audio/wav")
+        background_tasks.add_task(os.remove, speech_file_path)
+        
+        return response
+    except Exception as e:
+        print(str(e))
+        raise HTTPException(status_code=500, detail="An error occurred while processing the request.")
+    
+@app.post("/translate")
+async def translate_text(text: str = Body(..., embed=True), target_language: str = Body('en', embed=True)):
+    print(f"Translating text: {text} to language: {target_language}")  # Print the text and target language
+    translator = EasyGoogleTranslate(source_language='auto', target_language='target_language')
+    try:
+        translated_text = translator.translate(text)
+    except Exception as e:
+        print(f"Error: {str(e)}")  # Print the error message
+        raise HTTPException(status_code=500, detail=str(e))
+
+    print(f"Translated text: {translated_text}")  # Print the translated text
+    return {"translated_text": translated_text}
+
+app.include_router(chat_router, prefix="/api/chat")
+
+
+if __name__ == "__main__":
+    app_host = os.getenv("APP_HOST", "0.0.0.0")
+    app_port = int(os.getenv("APP_PORT", "8000"))
+    reload = True if environment == "dev" else False
+
+    uvicorn.run(app="main:app", host=app_host, port=app_port, reload=reload)
+
+
+
+# async def delete_file_after_delay(file_path: str, delay: int = 10):
+#     await asyncio.sleep(delay)
+#     try:
+#         os.remove(file_path)
+#         print(f"File {file_path} deleted successfully.")
+#     except Exception as e:
+#         print(f"Error deleting file {file_path}: {e}")
+
 # @app.post("/play_audio")
 # async def play_audio_endpoint(request: Request, background_tasks: BackgroundTasks):
 #     full_response = responses.get(request.client.host)
@@ -105,106 +195,3 @@ async def select_model_endpoint(selection: ModelSelection):
 #     except Exception as e:
 #         print(str(e))  # Log the error
 #         raise HTTPException(status_code=500, detail="An error occurred while processing the request.")
-
-
-# Set up your Azure subscription key and service region
-def synthesize_speech(text: str, lang: str, output_file: str):
-    # Set up Azure Cognitive Services Speech SDK configuration
-    speech_key = os.getenv("AZURE_SPEECH_KEY")
-    
-    service_region = os.getenv("AZURE_REGION")
-    
-    speech_config = speechsdk.SpeechConfig(subscription=speech_key, region=service_region)
-    # Use language-specific voice
-    if lang == "hi":
-        voice_name = "hi-IN-MadhurNeural"
-    elif lang == "gu":
-        voice_name = "gu-IN-NiranjanNeural"
-    else:
-        voice_name = "en-US-AriaNeural"  # Default to English
-    speech_config.speech_synthesis_voice_name = voice_name
-
-    # Create an audio output configuration
-    audio_config = speechsdk.audio.AudioOutputConfig(filename=output_file)
-    speech_synthesizer = speechsdk.SpeechSynthesizer(speech_config=speech_config, audio_config=audio_config)
-
-    # Synthesize speech and get the result
-    result = speech_synthesizer.speak_text_async(text).get()
-
-    # Check if the synthesis was successful
-    if result.reason == speechsdk.ResultReason.SynthesizingAudioCompleted:
-        print(f"Speech synthesis completed successfully. Audio saved to {output_file}")
-    else:
-        print("Speech synthesis failed.")
-        if result.reason == speechsdk.ResultReason.Canceled:
-            cancellation_details = result.cancellation_details
-            print(f"Speech synthesis canceled: {cancellation_details.reason}")
-            if cancellation_details.reason == speechsdk.CancellationReason.Error and cancellation_details.error_details:
-                print(f"Error details: {cancellation_details.error_details}")
-
-# async def delete_file_after_delay(file_path: str, delay: int = 10):
-#     await asyncio.sleep(delay)
-#     try:
-#         os.remove(file_path)
-#         print(f"File {file_path} deleted successfully.")
-#     except Exception as e:
-#         print(f"Error deleting file {file_path}: {e}")
-
-@app.post("/play_audio")
-async def play_audio_endpoint(request: Request, background_tasks: BackgroundTasks):
-    full_response = responses.get(request.client.host)
-    
-    if not full_response:
-        raise HTTPException(status_code=404, detail="Response not found for the client")
-
-    try:
-        # Detect the language of full_response
-        lang = detect(full_response)
-
-        # Generate a unique filename for the speech file
-        speech_file_path = f"speech_{uuid.uuid4()}.wav"
-        
-        # Convert full_response to speech using Azure Text-to-Speech
-        synthesize_speech(full_response, lang, speech_file_path)
-        
-        # Return the audio file
-        response = FileResponse(speech_file_path, media_type="audio/wav")
-        
-        # Schedule the file to be deleted after a delay
-        background_tasks.add_task(os.remove, speech_file_path)
-        
-        return response
-    except Exception as e:
-        print(str(e))  # Log the error
-        raise HTTPException(status_code=500, detail="An error occurred while processing the request.")
-
-
-
-    
-@app.post("/translate")
-async def translate_text(text: str = Body(..., embed=True), target_language: str = Body('en', embed=True)):
-    print(f"Translating text: {text} to language: {target_language}")  # Print the text and target language
-    translator = EasyGoogleTranslate(source_language='auto', target_language='target_language')
-    try:
-        translated_text = translator.translate(text)
-    except Exception as e:
-        print(f"Error: {str(e)}")  # Print the error message
-        raise HTTPException(status_code=500, detail=str(e))
-
-    print(f"Translated text: {translated_text}")  # Print the translated text
-    return {"translated_text": translated_text}
-
-
-
-
-
-
-app.include_router(chat_router, prefix="/api/chat")
-
-
-if __name__ == "__main__":
-    app_host = os.getenv("APP_HOST", "0.0.0.0")
-    app_port = int(os.getenv("APP_PORT", "8000"))
-    reload = True if environment == "dev" else False
-
-    uvicorn.run(app="main:app", host=app_host, port=app_port, reload=reload)

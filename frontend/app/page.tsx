@@ -23,7 +23,8 @@ import {
   CollapsibleTrigger,
 } from "./components/ui/collapsible"
 import { Button } from "./components/ui/button"
-
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faGear } from '@fortawesome/free-solid-svg-icons'
 
 export default function Home() {
   // State to hold the current value of each slider
@@ -95,6 +96,7 @@ export default function Home() {
 
       <Collapsible>
         <CollapsibleTrigger>
+        {/* <FontAwesomeIcon icon={faGear} /> &nbsp; */}
         Custom Settings
         {/* <Button variant="outline">Custom Settings</Button> */}
 

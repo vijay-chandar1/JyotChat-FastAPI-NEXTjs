@@ -1,7 +1,6 @@
 import { Check, Copy } from "lucide-react";
-
 import { Message } from "ai";
-import { Fragment } from "react";
+import { Fragment, useState, useRef, useEffect } from "react";
 import { Button } from "../button";
 import ChatAvatar from "./chat-avatar";
 import { ChatEvents } from "./chat-events";
@@ -17,6 +16,10 @@ import {
 } from "./index";
 import Markdown from "./markdown";
 import { useCopyToClipboard } from "./use-copy-to-clipboard";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faVolumeHigh, faStopCircle } from '@fortawesome/free-solid-svg-icons';
+import axios from 'axios';
+import { Switch } from "../switch";
 
 type ContentDisplayConfig = {
   order: number;
@@ -94,24 +97,120 @@ export default function ChatMessage({
   isLoading: boolean;
 }) {
   const { isCopied, copyToClipboard } = useCopyToClipboard({ timeout: 2000 });
-  
+
+  const [isPlaying, setIsPlaying] = useState(false);
+  const audioElement = useRef<HTMLAudioElement | null>(null);
+
+  const [isToggled, setIsToggled] = useState(false);
+  const [originalContent, setOriginalContent] = useState(chatMessage.content);
+  const [translatedContent, setTranslatedContent] = useState("");
+
+  useEffect(() => {
+    const translateContent = async () => {
+      const BASE_URL = process.env.REACT_APP_BASE_URL || 'http://localhost:8000';
+      try {
+        const response = await axios.post(`${BASE_URL}/translate`, { text: originalContent, target_language: 'en' });
+        setTranslatedContent(response.data.translated_text);
+      } catch (error) {
+        console.error('Error translating content:', error);
+      }
+    };
+
+    if (isToggled && !translatedContent) {
+      translateContent();
+    }
+  }, [isToggled, originalContent, translatedContent]);
+
+  useEffect(() => {
+    // Reset translation state when new message is received
+    setOriginalContent(chatMessage.content);
+    setTranslatedContent("");
+    setIsToggled(false);
+  }, [chatMessage.content]);
+
+  const handleAudioControl = async () => {
+    const BASE_URL = process.env.REACT_APP_BASE_URL || 'http://localhost:8000';
+    try {
+      if (isPlaying) {
+        // If audio is playing, stop it
+        if (audioElement.current) {
+          audioElement.current.pause();
+        }
+      } else {
+        // If audio is not playing, play it
+        const contentToPlay = isToggled ? translatedContent || originalContent : originalContent;
+        const response = await axios.post(`${BASE_URL}/play_audio`, { message: contentToPlay }, { responseType: 'arraybuffer' });
+        if (response.data) {
+          const blob = new Blob([response.data], { type: 'audio/mpeg' });
+          const url = URL.createObjectURL(blob);
+          audioElement.current = new Audio(url);
+          audioElement.current.play();
+
+          audioElement.current.addEventListener('ended', () => {
+            setIsPlaying(false);
+          });
+        }
+      }
+      // Update isPlaying state
+      setIsPlaying(!isPlaying);
+    } catch (error) {
+      console.error('Error controlling audio:', error);
+    }
+  }
+
+  const handleToggle = () => {
+    setIsToggled(!isToggled);
+  };
+
   return (
     <div className="flex items-start gap-4 pr-5 pt-5">
       <ChatAvatar role={chatMessage.role} />
       <div className="group flex flex-1 justify-between gap-2">
-        <ChatMessageContent message={chatMessage} isLoading={isLoading} />
-        <Button
-          onClick={() => copyToClipboard(chatMessage.content)}
-          size="icon"
-          variant="ghost"
-          className="h-8 w-8 opacity-0 group-hover:opacity-100"
-        >
-          {isCopied ? (
-            <Check className="h-4 w-4" />
-          ) : (
-            <Copy className="h-4 w-4" />
+        <ChatMessageContent
+          message={{ ...chatMessage, content: isToggled ? translatedContent || "Translating..." : originalContent }}
+          isLoading={isLoading}
+        />
+        <div className="flex items-center gap-2">
+          {chatMessage.role !== 'user' && (
+            <>
+              <Button
+                onClick={() => copyToClipboard(isToggled ? translatedContent : originalContent)}
+                size="icon"
+                variant="ghost"
+                className="h-8 w-8 opacity-0 group-hover:opacity-100"
+                style={{ backgroundColor: 'transparent' }}
+              >
+                {isCopied ? (
+                  <Check className="h-4 w-4" />
+                ) : (
+                  <Copy className="h-4 w-4" />
+                )}
+              </Button>
+              <Button
+                onClick={handleToggle}
+                size="icon"
+                variant="ghost"
+                className="h-8 w-8 opacity-0 group-hover:opacity-100"
+                style={{ backgroundColor: 'transparent' }}
+              >
+                <Switch checked={isToggled} onCheckedChange={handleToggle} />
+              </Button>
+              <Button
+                onClick={handleAudioControl}
+                size="icon"
+                variant="ghost"
+                className="h-8 w-8 opacity-0 group-hover:opacity-100"
+                style={{ backgroundColor: 'transparent' }}
+              >
+                <FontAwesomeIcon
+                  icon={isPlaying ? faStopCircle : faVolumeHigh}
+                  size="sm"
+                  style={{ cursor: 'pointer' }}
+                />
+              </Button>
+            </>
           )}
-        </Button>
+        </div>
       </div>
     </div>
   );
