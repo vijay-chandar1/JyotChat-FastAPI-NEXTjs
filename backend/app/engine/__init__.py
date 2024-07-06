@@ -25,7 +25,7 @@ def get_chat_engine():
         similarity_top_k=top_k,
         # node_postprocessors=[cohere_rerank],
         system_prompt=system_prompt,
-        chat_mode="condense_plus_context",
+        chat_mode="context",
         verbose=True
     )
 

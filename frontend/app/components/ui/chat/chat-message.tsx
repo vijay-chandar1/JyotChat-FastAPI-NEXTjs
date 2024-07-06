@@ -17,9 +17,14 @@ import {
 import Markdown from "./markdown";
 import { useCopyToClipboard } from "./use-copy-to-clipboard";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faVolumeHigh, faStopCircle } from '@fortawesome/free-solid-svg-icons';
+import { faVolumeHigh, faStopCircle, faSpinner } from '@fortawesome/free-solid-svg-icons';
 import axios from 'axios';
 import { Switch } from "../switch";
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "../hovercard"
 
 type ContentDisplayConfig = {
   order: number;
@@ -104,6 +109,8 @@ export default function ChatMessage({
   const [isToggled, setIsToggled] = useState(false);
   const [originalContent, setOriginalContent] = useState(chatMessage.content);
   const [translatedContent, setTranslatedContent] = useState("");
+  const [isLoadingAudio, setIsLoadingAudio] = useState(false); // Add state for loading audio
+
 
   useEffect(() => {
     const translateContent = async () => {
@@ -137,6 +144,7 @@ export default function ChatMessage({
           audioElement.current.pause();
         }
       } else {
+        setIsLoadingAudio(true); // Set loading state to true
         // If audio is not playing, play it
         const contentToPlay = isToggled ? translatedContent || originalContent : originalContent;
         const response = await axios.post(`${BASE_URL}/play_audio`, { message: contentToPlay }, { responseType: 'arraybuffer' });
@@ -145,9 +153,14 @@ export default function ChatMessage({
           const url = URL.createObjectURL(blob);
           audioElement.current = new Audio(url);
           audioElement.current.play();
-
+  
           audioElement.current.addEventListener('ended', () => {
             setIsPlaying(false);
+          });
+  
+          audioElement.current.addEventListener('canplaythrough', () => {
+            setIsLoadingAudio(false); // Set loading state to false when audio is ready
+            setIsPlaying(true);
           });
         }
       }
@@ -155,8 +168,10 @@ export default function ChatMessage({
       setIsPlaying(!isPlaying);
     } catch (error) {
       console.error('Error controlling audio:', error);
+      setIsLoadingAudio(false); // Set loading state to false in case of error
     }
   }
+  
 
   const handleToggle = () => {
     setIsToggled(!isToggled);
@@ -173,7 +188,9 @@ export default function ChatMessage({
         <div className="flex items-center gap-2">
           {chatMessage.role !== 'user' && (
             <>
-              <Button
+          <HoverCard>
+          <HoverCardTrigger>
+          <Button
                 onClick={() => copyToClipboard(isToggled ? translatedContent : originalContent)}
                 size="icon"
                 variant="ghost"
@@ -186,6 +203,15 @@ export default function ChatMessage({
                   <Copy className="h-4 w-4" />
                 )}
               </Button>
+          </HoverCardTrigger>
+          <HoverCardContent>
+            Copy Content
+          </HoverCardContent>
+          </HoverCard>
+
+          <HoverCard>
+          <HoverCardTrigger>
+          
               <Button
                 onClick={handleToggle}
                 size="icon"
@@ -195,6 +221,15 @@ export default function ChatMessage({
               >
                 <Switch checked={isToggled} onCheckedChange={handleToggle} />
               </Button>
+
+          </HoverCardTrigger>
+          <HoverCardContent>
+            Translate
+          </HoverCardContent>
+          </HoverCard>
+
+          <HoverCard>
+          <HoverCardTrigger>
               <Button
                 onClick={handleAudioControl}
                 size="icon"
@@ -202,12 +237,21 @@ export default function ChatMessage({
                 className="h-8 w-8 opacity-0 group-hover:opacity-100"
                 style={{ backgroundColor: 'transparent' }}
               >
+                {isLoadingAudio ? (
+                <FontAwesomeIcon icon={faSpinner} spin size="sm" style={{ cursor: 'pointer' }} />
+              ) : (
                 <FontAwesomeIcon
                   icon={isPlaying ? faStopCircle : faVolumeHigh}
                   size="sm"
                   style={{ cursor: 'pointer' }}
                 />
-              </Button>
+              )}
+            </Button>
+            </HoverCardTrigger>
+          <HoverCardContent>
+            Read Aloud
+          </HoverCardContent>
+          </HoverCard>
             </>
           )}
         </div>

@@ -97,7 +97,13 @@ export default function Home() {
       <Collapsible>
         <CollapsibleTrigger>
         {/* <FontAwesomeIcon icon={faGear} /> &nbsp; */}
-        Custom Settings
+        <HoverCard>
+        <HoverCardTrigger>Custom Settings</HoverCardTrigger>
+        <HoverCardContent>
+          Click to View Settings
+        </HoverCardContent>
+      </HoverCard>
+        
         {/* <Button variant="outline">Custom Settings</Button> */}
 
         </CollapsibleTrigger>
@@ -122,6 +128,7 @@ export default function Home() {
         </HoverCard>
         
       </div>
+      <div style={{ cursor: 'pointer' }}>
         {/* Slider for TopK */}
         <Slider
           defaultValue={[3]}
@@ -130,6 +137,7 @@ export default function Home() {
           step={1}
           onValueChange={(value) => setTopKValue(value[0])} // Update state when slider value changes
         />
+        </div>
         <br></br>
       {/* </div> */}
       {/* <div className="slider-wrapper" style={{ width: '20%', cursor: 'pointer' }}> */}
@@ -150,7 +158,7 @@ export default function Home() {
           </HoverCardContent>
         </HoverCard>
       </div>
-      
+      <div style={{ cursor: 'pointer' }}>
         {/* Slider for Temperature */}
         <Slider
           defaultValue={[0]}
@@ -159,6 +167,7 @@ export default function Home() {
           step={0.1}
           onValueChange={(value) => setTemperatureValue(value[0])} // Update state when slider value changes
         />
+      </div>
       {/* </div> */}
       <br></br>
       <HoverCard>

@@ -11,9 +11,15 @@ from app.engine import get_chat_engine
 from app.api.routers.vercel_response import VercelStreamResponse
 from app.api.routers.messaging import EventCallbackHandler
 from aiostream import stream
-
+from datetime import datetime
 chat_router = r = APIRouter()
 
+ENABLE_LOGGING = True
+LOG_FILE_PATH = "output.txt"
+def log_to_file(file_path: str, data: str):
+    if ENABLE_LOGGING:
+        with open(file_path, "a", encoding="utf-8") as f:
+            f.write(data + "\n")
 
 class _Message(BaseModel):
     role: MessageRole
@@ -94,26 +100,26 @@ async def chat(
 ):
     last_message_content, messages = await parse_chat_data(data)
 
+    log_to_file(LOG_FILE_PATH, f"{datetime.now()} - User Query: {last_message_content}")
+    log_to_file(LOG_FILE_PATH, f"------------------------------------------------------------------------")
     event_handler = EventCallbackHandler()
     chat_engine.callback_manager.handlers.append(event_handler)  # type: ignore
     response = await chat_engine.astream_chat(last_message_content, messages)
 
     async def content_generator():
-        # Yield the text response
         full_response = ''
         async def _text_generator():
             nonlocal full_response
             async for token in response.async_response_gen():
                 yield VercelStreamResponse.convert_text(token)
                 full_response += token
-            # the text_generator is the leading stream, once it's finished, also finish the event stream
             event_handler.is_done = True
-            print(f"Generated response: {full_response}")
-
-                # Store the full response in the dictionary
-            responses[request.client.host] = full_response
-
-        # Yield the events from the event handler
+            log_to_file(LOG_FILE_PATH, f"{datetime.now()} - Generated Response: {full_response}")
+            log_to_file(LOG_FILE_PATH, f"------------------------------------------------------------------------")
+            log_to_file(LOG_FILE_PATH, f"------------------------------------------------------------------------")
+        for node in response.source_nodes:
+            log_to_file(LOG_FILE_PATH, f"{datetime.now()} - Context Text: {node.node.text} - Page: {node.node.metadata.get('page_label', 'N/A')} FilePath: {node.node.metadata.get('file_path', 'N/A')}")
+            log_to_file(LOG_FILE_PATH, f"------------------------------------------------------------------------")
         async def _event_generator():
             async for event in event_handler.async_event_gen():
                 yield VercelStreamResponse.convert_data(
@@ -130,7 +136,6 @@ async def chat(
                     break
                 yield item
 
-        # Yield the source nodes
         yield VercelStreamResponse.convert_data(
             {
                 "type": "sources",

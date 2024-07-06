@@ -143,13 +143,16 @@ async def play_audio_endpoint(request: Request, background_tasks: BackgroundTask
 @app.post("/translate")
 async def translate_text(text: str = Body(..., embed=True), target_language: str = Body('en', embed=True)):
     print(f"Translating text: {text} to language: {target_language}")  # Print the text and target language
+    # logger.info(f"Translating text: {text} to language: {target_language}")
     translator = EasyGoogleTranslate(source_language='auto', target_language='target_language')
     try:
         translated_text = translator.translate(text)
     except Exception as e:
         print(f"Error: {str(e)}")  # Print the error message
+        # logger.error(f"Error: {str(e)}")  # Log the error message
         raise HTTPException(status_code=500, detail=str(e))
-
+    
+    logger.info(f"Translated text: {translated_text}")  # Log the translated text
     print(f"Translated text: {translated_text}")  # Print the translated text
     return {"translated_text": translated_text}
 
@@ -160,7 +163,7 @@ if __name__ == "__main__":
     app_host = os.getenv("APP_HOST", "0.0.0.0")
     app_port = int(os.getenv("APP_PORT", "8000"))
     reload = True if environment == "dev" else False
-
+    # logger.info(f"Starting server at {app_host}:{app_port}")
     uvicorn.run(app="main:app", host=app_host, port=app_port, reload=reload)
 
 
