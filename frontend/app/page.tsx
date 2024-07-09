@@ -90,17 +90,35 @@ export default function Home() {
 
   return (
     <main className="flex min-h-screen flex-col items-center gap-10 pt-5 p-24 background-gradient">
-      <div className="mt-0"> {/* Add margin-top to move Header down */}
+      <div className="mt-0"> 
+        {/* Add margin-top to move Header down */}
       <Header />
       </div>
 
       <Collapsible>
-        <CollapsibleTrigger>
+        <CollapsibleTrigger style={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
         {/* <FontAwesomeIcon icon={faGear} /> &nbsp; */}
         <HoverCard>
-        <HoverCardTrigger>Custom Settings</HoverCardTrigger>
+        <HoverCardTrigger
+        style={{
+          display: 'inline-block',
+          padding: '0.5rem 1rem',
+          backgroundColor: '#f0f0f0', // Light greyish-white color
+          color: '#000000', // Black text
+          borderRadius: '0.5rem',
+          cursor: 'pointer',
+          textAlign: 'center',
+          border: 'none',
+          transition: 'background-color 0.3s ease',
+          boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+        }}
+        onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#e0e0e0'} // Slightly darker grey on hover
+        onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#f0f0f0'} // Light greyish-white when not hovered
+      >
+          Custom Settings
+        </HoverCardTrigger>
         <HoverCardContent>
-          Click to View Settings
+          Toggle Settings
         </HoverCardContent>
       </HoverCard>
         
