@@ -114,7 +114,7 @@ export default function ChatMessage({
 
   useEffect(() => {
     const translateContent = async () => {
-      const BASE_URL = process.env.REACT_APP_BASE_URL || 'http://localhost:8000';
+      const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:8000';
       try {
         const response = await axios.post(`${BASE_URL}/translate`, { text: originalContent, target_language: 'en' });
         setTranslatedContent(response.data.translated_text);
@@ -136,7 +136,7 @@ export default function ChatMessage({
   }, [chatMessage.content]);
 
   const handleAudioControl = async () => {
-    const BASE_URL = process.env.REACT_APP_BASE_URL || 'http://localhost:8000';
+    const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:8000';
     try {
       if (isPlaying) {
         // If audio is playing, stop it

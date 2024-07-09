@@ -31,7 +31,7 @@ export default function Home() {
   const [selectedModel, setSelectedModel] = useState<'cohere' | 'openai' | null>('cohere');
   const [topKValue, setTopKValue] = useState(3);
   const [temperatureValue, setTemperatureValue] = useState(0);
-  const BASE_URL = process.env.REACT_APP_BASE_URL || 'http://localhost:8000';
+  const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:8000';
   const handleModelSelection = (value: string) => {
     setSelectedModel(value as 'cohere' | 'openai' | null);
   }
@@ -118,7 +118,7 @@ export default function Home() {
           Custom Settings
         </HoverCardTrigger>
         <HoverCardContent>
-          Toggle Settings
+          Click to Toggle 
         </HoverCardContent>
       </HoverCard>
         
