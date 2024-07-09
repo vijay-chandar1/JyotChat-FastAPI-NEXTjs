@@ -22,9 +22,9 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "./components/ui/collapsible"
-import { Button } from "./components/ui/button"
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faGear } from '@fortawesome/free-solid-svg-icons'
+// import { Button } from "./components/ui/button"
+// import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+// import { faGear } from '@fortawesome/free-solid-svg-icons'
 
 export default function Home() {
   // State to hold the current value of each slider
