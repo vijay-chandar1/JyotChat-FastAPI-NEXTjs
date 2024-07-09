@@ -7,15 +7,15 @@ import { useCopyToClipboard } from "./use-copy-to-clipboard";
 
 const SCORE_THRESHOLD = 0.5;
 
-const filePathMapping: { [key: string]: string } = {
-  "Dharmtirth-Part-01": "dharmtirth_part_01.pdf",
-  "Dharmtirth-Part-02": "dharmtirth_part_02.pdf",
-  "Prashnottari": "prashnottari.pdf",
-  "Darshanachar": "darshanachar.pdf", 
-  "Manovijay-Ane-Atmshuddhi": "manovijay_ane_atmshuddhi.pdf",
-  "Jain-Philosophy": "jain_philosophy.pdf", 
-  "Sadgati-Tamara-Hathma": "sadgati_tamara_hathma.pdf",
-};
+// const filePathMapping: { [key: string]: string } = {
+//   "Dharmtirth-Part-01": "dharmtirth_part_01.pdf",
+//   "Dharmtirth-Part-02": "dharmtirth_part_02.pdf",
+//   "Prashnottari": "prashnottari.pdf",
+//   "Darshanachar": "darshanachar.pdf", 
+//   "Manovijay-Ane-Atmshuddhi": "manovijay_ane_atmshuddhi.pdf",
+//   "Jain-Philosophy": "jain_philosophy.pdf", 
+//   "Sadgati-Tamara-Hathma": "sadgati_tamara_hathma.pdf",
+// };
 
 export function ChatSources({ data }: { data: SourceData }) {
   const sources = useMemo(() => {
@@ -88,8 +88,6 @@ function NodeInfo({ node }: { node: SourceNode }) {
       // remove the extension from the file name
       filePath = path.parse(filePath).name;
 
-      let mappedFilePath = filePathMapping[filePath] || filePath;
-
       let pageLabel = "";
       if (typeof node.metadata["page_label"] === "string") { 
         pageLabel = node.metadata["page_label"];
@@ -105,7 +103,7 @@ function NodeInfo({ node }: { node: SourceNode }) {
     return (
       <div className="flex items-center px-2 py-1 justify-between my-2">
         <a
-    href={filePath.startsWith("http") ? `${filePath}#page=${pageLabel}` : `https://stljyot1.blob.core.windows.net/stl-jyot-ai-resources/pdfs/${mappedFilePath}#page=${pageLabel}`}
+    href={filePath.startsWith("http") ? `${filePath}#page=${pageLabel}` : `https://stljyot1.blob.core.windows.net/stl-jyot-ai-resources/pdfs/${filePath}.pdf#page=${pageLabel}`}
     target="_blank"
     style={{ color: 'black', cursor: 'pointer', textDecoration: 'none' }}
     onMouseOver={(e) => (e.target as HTMLElement).style.color = 'grey'}
@@ -114,7 +112,7 @@ function NodeInfo({ node }: { node: SourceNode }) {
     {filePath} (Page: {pageLabel})
   </a>
         <Button
-          onClick={() => copyToClipboard(filePath.startsWith("http") ? `${filePath}#page=${pageLabel}` : `https://stljyot1.blob.core.windows.net/stl-jyot-ai-resources/pdfs/${mappedFilePath}#page=${pageLabel}`)}
+          onClick={() => copyToClipboard(filePath.startsWith("http") ? `${filePath}#page=${pageLabel}` : `https://stljyot1.blob.core.windows.net/stl-jyot-ai-resources/pdfs/${filePath}.pdf#page=${pageLabel}`)}
           size="icon"
           variant="ghost"
           className="h-12 w-12"
