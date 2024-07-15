@@ -60,7 +60,16 @@ if environment == "dev":
         allow_methods=["*"],
         allow_headers=["*"],
     )
-
+else:
+    logger = logging.getLogger("uvicorn")
+    logger.warning("Running in development mode - allowing CORS for all origins")
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=["*"],
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
     # Redirect to documentation page when accessing base URL
     @app.get("/")
     async def redirect_to_docs():

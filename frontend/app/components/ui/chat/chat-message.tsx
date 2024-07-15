@@ -114,7 +114,7 @@ export default function ChatMessage({
 
   useEffect(() => {
     const translateContent = async () => {
-      const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:8000';
+      const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
       try {
         const response = await axios.post(`${BASE_URL}/translate`, { text: originalContent, target_language: 'en' });
         setTranslatedContent(response.data.translated_text);
@@ -136,7 +136,7 @@ export default function ChatMessage({
   }, [chatMessage.content]);
 
   const handleAudioControl = async () => {
-    const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:8000';
+    const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
     try {
       if (isPlaying) {
         // If audio is playing, stop it
@@ -148,6 +148,7 @@ export default function ChatMessage({
         // If audio is not playing, play it
         const contentToPlay = isToggled ? translatedContent || originalContent : originalContent;
         const response = await axios.post(`${BASE_URL}/play_audio`, { message: contentToPlay }, { responseType: 'arraybuffer' });
+        
         if (response.data) {
           const blob = new Blob([response.data], { type: 'audio/mpeg' });
           const url = URL.createObjectURL(blob);
