@@ -30,7 +30,7 @@ export default function Home() {
   // State to hold the current value of each slider
   const [selectedModel, setSelectedModel] = useState<'cohere' | 'openai' | null>('cohere');
   const [topKValue, setTopKValue] = useState(3);
-  const [temperatureValue, setTemperatureValue] = useState(0);
+  const [temperatureValue, setTemperatureValue] = useState(0.4);
   const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
   const handleModelSelection = (value: string) => {
     setSelectedModel(value as 'cohere' | 'openai' | null);
@@ -179,7 +179,7 @@ export default function Home() {
       <div style={{ cursor: 'pointer' }}>
         {/* Slider for Temperature */}
         <Slider
-          defaultValue={[0]}
+          defaultValue={[0.4]}
           min={0}
           max={1}
           step={0.1}

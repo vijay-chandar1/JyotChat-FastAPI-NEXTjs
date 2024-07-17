@@ -1,6 +1,7 @@
 import os
 from app.engine.index import get_index
 from fastapi import HTTPException
+
 # from llama_index.postprocessor.cohere_rerank import CohereRerank
 
 # Initialize top_k with default value from environment variable
@@ -25,8 +26,14 @@ def get_chat_engine():
         similarity_top_k=top_k,
         # node_postprocessors=[cohere_rerank],
         system_prompt=system_prompt,
+                context_prompt=(
+            "You are a chatbot, able to have normal interactions, as well as talk"
+            "Here are the relevant documents for the context:\n"
+            "{context_str}"
+            "\nInstruction: Based on the above documents, provide a detailed answer for the user question below."),
         chat_mode="context",
         verbose=True
+        
     )
 
 #system_prompt=system_prompt

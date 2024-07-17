@@ -12,6 +12,7 @@ from app.api.routers.vercel_response import VercelStreamResponse
 from app.api.routers.messaging import EventCallbackHandler
 from aiostream import stream
 from datetime import datetime
+import os
 chat_router = r = APIRouter()
 
 ENABLE_LOGGING = True
@@ -117,6 +118,7 @@ async def chat(
             log_to_file(LOG_FILE_PATH, f"{datetime.now()} - Generated Response: {full_response}")
             log_to_file(LOG_FILE_PATH, f"------------------------------------------------------------------------")
             log_to_file(LOG_FILE_PATH, f"------------------------------------------------------------------------")
+            os.system("python ./database_update.py")
         for node in response.source_nodes:
             log_to_file(LOG_FILE_PATH, f"{datetime.now()} - Context Text: {node.node.text} - Page: {node.node.metadata.get('page_label', 'N/A')} FilePath: {node.node.metadata.get('file_path', 'N/A')}")
             log_to_file(LOG_FILE_PATH, f"------------------------------------------------------------------------")

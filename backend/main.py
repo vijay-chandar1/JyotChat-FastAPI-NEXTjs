@@ -65,7 +65,7 @@ else:
     logger.warning("Running in development mode - allowing CORS for all origins")
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=["*"],
+        allow_origins=["https://jyotchat.azurewebsites.net/"],
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
