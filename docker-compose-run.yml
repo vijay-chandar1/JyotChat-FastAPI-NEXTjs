@@ -1,34 +1,39 @@
 version: '3.8'
 
 services:
+  proxy:
+    image: jyotchat.azurecr.io/jyotchatproxy:build-1
+    container_name: nginx-proxy
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+      - frontend
+    networks:
+      - app-network
+
   backend:
     image: jyotchat.azurecr.io/jyotchatbackend:build-1
-    ports:
-      - "8000:8000"
-    # environment:
-    #   - COHERE_API_KEY=zQ39yHSCDroaW26d39wC87TJkcHyC0o4ky1P5th5
-    #   - OPENAI_API_KEY=sk-ai-engineering-jyot-stl-Db4NPPc1reUDPeGOS22kT3BlbkFJmdLox0TwBNr2eR0dpTKq
-    #   - AZURE_SPEECH_KEY=a1c5d84409ac40a2ab4b06ce4d0bb6b7
-    #   - PINECONE_API_KEY=83c5e56e-aaa2-4d6d-ac69-ca04e632d8c3
-    volumes:
-      - backend_data:/app/backend/output.txt
+    container_name: Jyotchat-backend
+    environment:
+      - AZURE_SPEECH_KEY=a1c5d84409ac40a2ab4b06ce4d0bb6b7
+      - COHERE_API_KEY=zQ39yHSCDroaW26d39wC87TJkcHyC0o4ky1P5th5
+      - OPENAI_API_KEY=sk-ai-engineering-jyot-stl-Db4NPPc1reUDPeGOS22kT3BlbkFJmdLox0TwBNr2eR0dpTKq
+      - PINECONE_API_KEY=83c5e56e-aaa2-4d6d-ac69-ca04e632d8c3
+      - PINECONE_INDEX_NAME=jyot
+      - DB_USER=postgres.rqrqwmvhoppmopkjaarg
+      - DB_PASS=2r97x94P2kdYupc2
     networks:
       - app-network
 
   frontend:
     image: jyotchat.azurecr.io/jyotchatfrontend:build-1
-    ports:
-      - "3001:3000"
-    # environment:
-    #   - NEXT_PUBLIC_BASE_URL=http://localhost:8000
-    #   - NEXT_PUBLIC_CHAT_API=http://localhost:8000/api/chat
-    depends_on:
-      - backend
+    container_name: Jyotchat-frontend
+    environment:
+      - NEXT_PUBLIC_BASE_URL=http://backend:8000
+      - NEXT_PUBLIC_CHAT_API=http://backend:8000/api/chat
     networks:
       - app-network
-
-volumes:
-  backend_data:
 
 networks:
   app-network:
