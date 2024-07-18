@@ -21,6 +21,7 @@ llama-index-llms-litellm = "^0.1.4"
 langdetect = "^1.0.9"
 easygoogletranslate = "^0.0.4"
 azure-cognitiveservices-speech = "^1.38.0"
+psycopg2 = "^2.9.9"
 
 [tool.poetry.dependencies.uvicorn]
 extras = [ "standard" ]

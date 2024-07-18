@@ -63,8 +63,6 @@ if environment == "dev":
 else:
     logger = logging.getLogger("uvicorn")
     logger.warning("Running in development mode - allowing CORS for all origins")
-    frontend_origin = "http://frontend:3000"  # The exact origin of your frontend
-    logger.info(f"Restricting CORS to frontend origin: {frontend_origin}")
     app.add_middleware(
         CORSMiddleware,
         allow_origins=["*"],
