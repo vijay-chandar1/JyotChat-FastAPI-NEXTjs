@@ -1,7 +1,7 @@
 "use client"
 import Header from "@/app/components/header";
 import ChatSection from "./components/chat-section";
-import { useState, useEffect } from "react";
+import { useState, useEffect} from "react";
 import { Slider } from "./components/ui/slider";
 import {
   Select,

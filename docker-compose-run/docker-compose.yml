@@ -30,11 +30,12 @@ services:
     image: jyotchat.azurecr.io/jyotchatfrontend:build-1
     container_name: Jyotchat-frontend
     environment:
-      - NEXT_PUBLIC_BASE_URL=http://backend:8000
-      - NEXT_PUBLIC_CHAT_API=http://backend:8000/api/chat
+      - NEXT_PUBLIC_BASE_URL=https://jyotchat.azurewebsites.net
+      - NEXT_PUBLIC_CHAT_API=https://jyotchat.azurewebsites.net/api/chat
     networks:
       - app-network
 
 networks:
   app-network:
+    name: app-network
     driver: bridge
