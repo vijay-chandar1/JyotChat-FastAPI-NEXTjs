@@ -114,7 +114,7 @@ export default function ChatMessage({
     const translateContent = async () => {
       const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
       try {
-        const response = await fetch(`${BASE_URL}/translate`, {
+        const response = await fetch(`${BASE_URL}/api/translate`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -157,7 +157,7 @@ export default function ChatMessage({
         setIsLoadingAudio(true); // Set loading state to true
         // If audio is not playing, play it
         const contentToPlay = isToggled ? translatedContent || originalContent : originalContent;
-        const response = await fetch(`${BASE_URL}/play_audio`, {
+        const response = await fetch(`${BASE_URL}/api/play_audio`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

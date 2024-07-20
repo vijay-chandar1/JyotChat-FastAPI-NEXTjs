@@ -75,18 +75,22 @@ else:
     async def redirect_to_docs():
         return RedirectResponse(url="/docs")
 
-@app.post("/update_temperature")
+@app.get("/health")
+async def health_check():
+    return {"status": "ok"}
+
+@app.post("/api/update_temperature")
 async def update_temperature_endpoint(update: TemperatureUpdate):
     update_temperature(temperature=update.temperature)
     return {"message": "Temperature updated successfully"}
 
 
-@app.post("/update_topk")
+@app.post("/api/update_topk")
 async def update_topk_endpoint(update: TopKUpdate):
     update_topK(update.topK)
     return {"message": "topK updated successfully"}
 
-@app.post("/select_model")
+@app.post("/api/select_model")
 async def select_model_endpoint(selection: ModelSelection):
     # Call the function to update the model in settings
     init_cohere(model_name=selection.model)
@@ -128,7 +132,7 @@ def synthesize_speech(text: str, lang: str, output_file: str):
                 print(f"Error details: {cancellation_details.error_details}")
 
 
-@app.post("/play_audio")
+@app.post("/api/play_audio")
 async def play_audio_endpoint(request: Request, background_tasks: BackgroundTasks):
     try:
         data = await request.json()
@@ -149,7 +153,7 @@ async def play_audio_endpoint(request: Request, background_tasks: BackgroundTask
         print(str(e))
         raise HTTPException(status_code=500, detail="An error occurred while processing the request.")
     
-@app.post("/translate")
+@app.post("/api/translate")
 async def translate_text(text: str = Body(..., embed=True), target_language: str = Body('en', embed=True)):
     print(f"Translating text: {text} to language: {target_language}")  # Print the text and target language
     # logger.info(f"Translating text: {text} to language: {target_language}")

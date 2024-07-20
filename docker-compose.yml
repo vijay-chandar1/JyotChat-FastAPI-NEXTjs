@@ -35,10 +35,13 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
     container_name: Jyotchat-frontend
-
+    environment:
+      - NEXT_PUBLIC_BASE_URL=https://jyotchat.azurewebsites.net
+      - NEXT_PUBLIC_CHAT_API=https://jyotchat.azurewebsites.net/api/chat
     networks:
       - app-network
 
 networks:
   app-network:
+    name: app-network
     driver: bridge

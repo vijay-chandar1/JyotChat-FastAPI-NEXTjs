@@ -37,7 +37,7 @@ export default function Home() {
     // Define a function to make the API call to update temperature
     const updateTemperatureBackend = async () => {
       try {
-        const response = await fetch(`${BASE_URL}/update_temperature`, {
+        const response = await fetch(`${BASE_URL}/api/update_temperature`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -62,7 +62,7 @@ export default function Home() {
     // Define a function to make the API call to update topK
     const updateTopKBackend = async () => {
       try {
-        const response = await fetch(`${BASE_URL}/update_topk`, {
+        const response = await fetch(`${BASE_URL}/api/update_topk`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -92,7 +92,7 @@ export default function Home() {
     // Define a function to make the API call to update the model
     const updateModelBackend = async () => {
       try {
-        const response = await fetch(`${BASE_URL}/select_model`, {
+        const response = await fetch(`${BASE_URL}/api/select_model`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
