@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Button } from "../button";
-import FileUploader from "../file-uploader";
+// import FileUploader from "../file-uploader";
 import { Input } from "../input";
 import UploadImagePreview from "../upload-image-preview";
 import { ChatHandler } from "./chat.interface";

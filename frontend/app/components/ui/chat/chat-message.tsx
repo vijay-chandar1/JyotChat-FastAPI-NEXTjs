@@ -18,7 +18,6 @@ import Markdown from "./markdown";
 import { useCopyToClipboard } from "./use-copy-to-clipboard";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faVolumeHigh, faStopCircle, faSpinner } from '@fortawesome/free-solid-svg-icons';
-import axios from 'axios';
 import { Switch } from "../switch";
 import {
   HoverCard,
@@ -111,13 +110,24 @@ export default function ChatMessage({
   const [translatedContent, setTranslatedContent] = useState("");
   const [isLoadingAudio, setIsLoadingAudio] = useState(false); // Add state for loading audio
 
-
   useEffect(() => {
     const translateContent = async () => {
       const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
       try {
-        const response = await axios.post(`${BASE_URL}/translate`, { text: originalContent, target_language: 'en' });
-        setTranslatedContent(response.data.translated_text);
+        const response = await fetch(`${BASE_URL}/translate`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ text: originalContent, target_language: 'en' }),
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          setTranslatedContent(data.translated_text);
+        } else {
+          console.error('Error translating content:', response.statusText);
+        }
       } catch (error) {
         console.error('Error translating content:', error);
       }
@@ -147,22 +157,31 @@ export default function ChatMessage({
         setIsLoadingAudio(true); // Set loading state to true
         // If audio is not playing, play it
         const contentToPlay = isToggled ? translatedContent || originalContent : originalContent;
-        const response = await axios.post(`${BASE_URL}/play_audio`, { message: contentToPlay }, { responseType: 'arraybuffer' });
-        
-        if (response.data) {
-          const blob = new Blob([response.data], { type: 'audio/mpeg' });
+        const response = await fetch(`${BASE_URL}/play_audio`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ message: contentToPlay }),
+        });
+
+        if (response.ok) {
+          const arrayBuffer = await response.arrayBuffer();
+          const blob = new Blob([arrayBuffer], { type: 'audio/mpeg' });
           const url = URL.createObjectURL(blob);
           audioElement.current = new Audio(url);
           audioElement.current.play();
-  
+
           audioElement.current.addEventListener('ended', () => {
             setIsPlaying(false);
           });
-  
+
           audioElement.current.addEventListener('canplaythrough', () => {
             setIsLoadingAudio(false); // Set loading state to false when audio is ready
             setIsPlaying(true);
           });
+        } else {
+          console.error('Error fetching audio:', response.statusText);
         }
       }
       // Update isPlaying state
@@ -171,8 +190,7 @@ export default function ChatMessage({
       console.error('Error controlling audio:', error);
       setIsLoadingAudio(false); // Set loading state to false in case of error
     }
-  }
-  
+  };
 
   const handleToggle = () => {
     setIsToggled(!isToggled);
@@ -189,70 +207,68 @@ export default function ChatMessage({
         <div className="flex items-center gap-2">
           {chatMessage.role !== 'user' && (
             <>
-          <HoverCard>
-          <HoverCardTrigger>
-          <Button
-                onClick={() => copyToClipboard(isToggled ? translatedContent : originalContent)}
-                size="icon"
-                variant="ghost"
-                className="h-8 w-8 opacity-0 group-hover:opacity-100"
-                style={{ backgroundColor: 'transparent' }}
-              >
-                {isCopied ? (
-                  <Check className="h-4 w-4" />
-                ) : (
-                  <Copy className="h-4 w-4" />
-                )}
-              </Button>
-          </HoverCardTrigger>
-          <HoverCardContent>
-            Copy Content
-          </HoverCardContent>
-          </HoverCard>
+              <HoverCard>
+                <HoverCardTrigger>
+                  <Button
+                    onClick={() => copyToClipboard(isToggled ? translatedContent : originalContent)}
+                    size="icon"
+                    variant="ghost"
+                    className="h-8 w-8 opacity-0 group-hover:opacity-100"
+                    style={{ backgroundColor: 'transparent' }}
+                  >
+                    {isCopied ? (
+                      <Check className="h-4 w-4" />
+                    ) : (
+                      <Copy className="h-4 w-4" />
+                    )}
+                  </Button>
+                </HoverCardTrigger>
+                <HoverCardContent>
+                  Copy Content
+                </HoverCardContent>
+              </HoverCard>
 
-          <HoverCard>
-          <HoverCardTrigger>
-          
-              <Button
-                onClick={handleToggle}
-                size="icon"
-                variant="ghost"
-                className="h-8 w-8 opacity-0 group-hover:opacity-100"
-                style={{ backgroundColor: 'transparent' }}
-              >
-                <Switch checked={isToggled} onCheckedChange={handleToggle} />
-              </Button>
+              <HoverCard>
+                <HoverCardTrigger>
+                  <Button
+                    onClick={handleToggle}
+                    size="icon"
+                    variant="ghost"
+                    className="h-8 w-8 opacity-0 group-hover:opacity-100"
+                    style={{ backgroundColor: 'transparent' }}
+                  >
+                    <Switch checked={isToggled} onCheckedChange={handleToggle} />
+                  </Button>
+                </HoverCardTrigger>
+                <HoverCardContent>
+                  Translate
+                </HoverCardContent>
+              </HoverCard>
 
-          </HoverCardTrigger>
-          <HoverCardContent>
-            Translate
-          </HoverCardContent>
-          </HoverCard>
-
-          <HoverCard>
-          <HoverCardTrigger>
-              <Button
-                onClick={handleAudioControl}
-                size="icon"
-                variant="ghost"
-                className="h-8 w-8 opacity-0 group-hover:opacity-100"
-                style={{ backgroundColor: 'transparent' }}
-              >
-                {isLoadingAudio ? (
-                <FontAwesomeIcon icon={faSpinner} spin size="sm" style={{ cursor: 'pointer' }} />
-              ) : (
-                <FontAwesomeIcon
-                  icon={isPlaying ? faStopCircle : faVolumeHigh}
-                  size="sm"
-                  style={{ cursor: 'pointer' }}
-                />
-              )}
-            </Button>
-            </HoverCardTrigger>
-          <HoverCardContent>
-            Read Aloud
-          </HoverCardContent>
-          </HoverCard>
+              <HoverCard>
+                <HoverCardTrigger>
+                  <Button
+                    onClick={handleAudioControl}
+                    size="icon"
+                    variant="ghost"
+                    className="h-8 w-8 opacity-0 group-hover:opacity-100"
+                    style={{ backgroundColor: 'transparent' }}
+                  >
+                    {isLoadingAudio ? (
+                      <FontAwesomeIcon icon={faSpinner} spin size="sm" style={{ cursor: 'pointer' }} />
+                    ) : (
+                      <FontAwesomeIcon
+                        icon={isPlaying ? faStopCircle : faVolumeHigh}
+                        size="sm"
+                        style={{ cursor: 'pointer' }}
+                      />
+                    )}
+                  </Button>
+                </HoverCardTrigger>
+                <HoverCardContent>
+                  Read Aloud
+                </HoverCardContent>
+              </HoverCard>
             </>
           )}
         </div>

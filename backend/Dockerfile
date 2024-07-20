@@ -23,4 +23,6 @@ FROM build as release
 
 COPY . .
 
+EXPOSE 8000
+
 CMD ["python", "main.py"]

@@ -3,7 +3,6 @@ import Header from "@/app/components/header";
 import ChatSection from "./components/chat-section";
 import { useState, useEffect } from "react";
 import { Slider } from "./components/ui/slider";
-// import { ComboboxDemo } from "./components/ui/combobox";
 import {
   Select,
   SelectContent,
@@ -11,7 +10,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "./components/ui/select"
-import axios from "axios";
 import {
   HoverCard,
   HoverCardContent,
@@ -22,9 +20,6 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "./components/ui/collapsible"
-// import { Button } from "./components/ui/button"
-// import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-// import { faGear } from '@fortawesome/free-solid-svg-icons'
 
 export default function Home() {
   // State to hold the current value of each slider
@@ -32,42 +27,63 @@ export default function Home() {
   const [topKValue, setTopKValue] = useState(3);
   const [temperatureValue, setTemperatureValue] = useState(0.4);
   const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
+  
   const handleModelSelection = (value: string) => {
     setSelectedModel(value as 'cohere' | 'openai' | null);
   }
 
   useEffect(() => {
+    console.log("Temperature effect triggered");
     // Define a function to make the API call to update temperature
     const updateTemperatureBackend = async () => {
       try {
-        await axios.post(`${BASE_URL}/update_temperature`, {
-          temperature: temperatureValue
+        const response = await fetch(`${BASE_URL}/update_temperature`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ temperature: temperatureValue }),
         });
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
         console.log('Temperature updated in the backend successfully!');
       } catch (error) {
         console.error('Error updating temperature in the backend:', error);
       }
     };
 
+    // Call the function to update the backend when temperature value changes
+    updateTemperatureBackend();
+  }, [temperatureValue]);
+
+  useEffect(() => {
+    console.log("TopK effect triggered");
     // Define a function to make the API call to update topK
     const updateTopKBackend = async () => {
       try {
-        await axios.post(`${BASE_URL}/update_topk`, {
-          topK: topKValue
+        const response = await fetch(`${BASE_URL}/update_topk`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ topK: topKValue }),
         });
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
         console.log('topK updated in the backend successfully!');
       } catch (error) {
         console.error('Error updating topK in the backend:', error);
       }
     };
 
-    // Call the function to update the backend when temperature value changes
-    updateTemperatureBackend();
     // Call the function to update the backend when topK value changes
     updateTopKBackend();
-  }, [temperatureValue, topKValue]);
-  
+  }, [topKValue]);
+
   useEffect(() => {
+    console.log("Model effect triggered");
     // If no model is selected, return early
     if (!selectedModel) {
       return;
@@ -76,9 +92,16 @@ export default function Home() {
     // Define a function to make the API call to update the model
     const updateModelBackend = async () => {
       try {
-        await axios.post(`${BASE_URL}/select_model`, {
-          model: selectedModel
+        const response = await fetch(`${BASE_URL}/select_model`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ model: selectedModel }),
         });
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
         console.log('Model updated in the backend successfully!');
       } catch (error) {
         console.error('Error updating model in the backend:', error);

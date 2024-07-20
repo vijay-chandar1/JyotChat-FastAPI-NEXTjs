@@ -35,9 +35,7 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
     container_name: Jyotchat-frontend
-    environment:
-      - NEXT_PUBLIC_BASE_URL=http://backend:8000
-      - NEXT_PUBLIC_CHAT_API=http://backend:8000/api/chat
+
     networks:
       - app-network
 
