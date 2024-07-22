@@ -20,7 +20,7 @@ services:
       dockerfile: Dockerfile
     container_name: Jyotchat-backend
     environment:
-      - AZURE_SPEECH_KEY=a1c5d84409ac40a2ab4b06ce4d0bb6b7
+      - AZURE_SPEECH_KEY=9ca642e4de88430e803c483073ff1765
       - COHERE_API_KEY=zQ39yHSCDroaW26d39wC87TJkcHyC0o4ky1P5th5
       - OPENAI_API_KEY=sk-ai-engineering-jyot-stl-Db4NPPc1reUDPeGOS22kT3BlbkFJmdLox0TwBNr2eR0dpTKq
       - PINECONE_API_KEY=83c5e56e-aaa2-4d6d-ac69-ca04e632d8c3
