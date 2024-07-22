@@ -113,10 +113,10 @@ export default function Home() {
 
   return (
     <main className="flex min-h-screen flex-col items-center gap-10 pt-5 p-24 background-gradient">
-      <div className="mt-0"> 
+      {/* <div className="mt-0">  */}
         {/* Add margin-top to move Header down */}
       <Header />
-      </div>
+      {/* </div> */}
 
       <Collapsible>
         <CollapsibleTrigger style={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
